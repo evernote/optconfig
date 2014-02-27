@@ -1,6 +1,6 @@
 NAME=optconfig
 VERSION=1.0
-RELEASE=1
+RELEASE=2
 SOURCE=$(NAME)-$(VERSION).tar.gz
 ARCH=noarch
 EXES=showconfig optconfig.sh ppenv.sh ppenv.csh
