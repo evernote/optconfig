@@ -31,7 +31,7 @@ opt_new_gen()
    optspec="$1"
    shift 1
    ruby \
-      -e '$LOAD_PATH.unshift("/opt/pptools")' \
+      -e '$LOAD_PATH.unshift("/usr/local")' \
       -e 'require "ppenv"' \
       -e 'require "optconfig"' \
       -e 'require "json"' \
@@ -54,7 +54,7 @@ opt_new_gen()
 json2bashon_gen()
 {
    ruby \
-      -e '$LOAD_PATH.unshift("/opt/pptools")' \
+      -e '$LOAD_PATH.unshift("/usr/local")' \
       -e 'require "ppenv"' \
       -e 'require "bashon"' \
       -e 'require "json"' \
