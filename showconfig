@@ -58,8 +58,8 @@ rubywhich()
 
 if [ "$lang" = perl ]
 then
-   echo -n "Using "; PERLLIB=$PERLLIB:/opt/pptools perlwhich Optconfig
-   PERLLIB=$PERLLIB:/opt/pptools perl -Mppenv -MOptconfig -MJSON \
+   echo -n "Using "; PERLLIB=$PERLLIB:/usr/local perlwhich Optconfig
+   PERLLIB=$PERLLIB:/usr/local perl -Mppenv -MOptconfig -MJSON \
       -e 'use vars qw($VERSION); $VERSION = "__VERSION__";' \
       -e 'my $domain = shift(@ARGV);' \
       -e 'my $spectext = shift(@ARGV);' \
@@ -68,9 +68,9 @@ then
       -e 'print(($JSON::VERSION >= 2.0 ? to_json($opt->hash) : objToJson($opt->hash)), "\n");' "$domain" "$@"
 elif [ "$lang" = ruby ]
 then
-   echo -n "Using "; RUBYLIB=$RUBYLIB:/opt/pptools rubywhich optconfig
+   echo -n "Using "; RUBYLIB=$RUBYLIB:/usr/local rubywhich optconfig
    ruby \
-      -e '$LOAD_PATH.unshift("/opt/pptools")' \
+      -e '$LOAD_PATH.unshift("/usr/local")' \
       -e 'require "ppenv"' \
       -e 'require "optconfig"' \
       -e 'require "json"' \
@@ -81,7 +81,7 @@ then
       -e 'puts opt.to_json' "$domain" "$@"
 elif [ "$lang" = bash ]
 then
-   export PATH=/opt/pptools:$PATH
+   export PATH=/usr/local:$PATH
    . ppenv.sh
    echo -n "Using "; which optconfig.sh
    . optconfig.sh

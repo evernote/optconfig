@@ -1,4 +1,4 @@
 #!csh
 
-setenv PATH `sh -c '. /opt/pptools/ppenv.sh; echo $PATH'`
-setenv MANPATH `sh -c '. /opt/pptools/ppenv.sh; echo $PATH'`
+setenv PATH `sh -c '. /usr/local/ppenv.sh; echo $PATH'`
+setenv MANPATH `sh -c '. /usr/local/ppenv.sh; echo $PATH'`

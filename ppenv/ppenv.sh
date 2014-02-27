@@ -19,7 +19,7 @@
 # not sure I've actually done that but it works in ksh, too, at least.
 
 # Well-known path
-WKP=/opt/pptools
+WKP=/usr/local
 
 make_ppenv_path()
 {

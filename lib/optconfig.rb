@@ -47,7 +47,7 @@ class Optconfig < Hash
          self[opt] = val
       end
       cmdlineopt = Longopt.new(optspec.keys)
-      cfgfilepath = [ '/opt/pptools/etc/' + domain + '.conf' ]
+      cfgfilepath = [ '/usr/local/etc/' + domain + '.conf' ]
       if ENV.has_key? 'HOME' and ! ENV['HOME'].nil?
          cfgfilepath.unshift(ENV['HOME'] + '/.' + domain)
       end
