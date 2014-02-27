@@ -3,7 +3,7 @@ VERSION=1.0
 RELEASE=1
 SOURCE=$(NAME)-$(VERSION).tar.gz
 ARCH=noarch
-EXES=showconfig optconfig.sh
+EXES=showconfig optconfig.sh ppenv.sh ppenv.csh
 CLEAN_TARGETS=$(SPEC) $(NAME)-$(VERSION) $(SOURCE) # for in-house package
 
 include $(shell starter)/rules.mk
