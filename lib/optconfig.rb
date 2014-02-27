@@ -39,19 +39,24 @@ class Optconfig < Hash
       optspec
    end
 
-   def initialize(domain, submitted_optspec)
+   def initialize(domain, submitted_optspec, cmdline=true)
       @domain = domain
       @optspec = add_standard_opts(submitted_optspec)
       submitted_optspec.each_pair do |optspec, val|
          opt, dummy = optspec.split(/[\=\+\!]/, 2)
          self[opt] = val
       end
-      cmdlineopt = Longopt.new(optspec.keys)
       cfgfilepath = [ '/usr/local/etc/' + domain + '.conf' ]
+
       if ENV.has_key? 'HOME' and ! ENV['HOME'].nil?
          cfgfilepath.unshift(ENV['HOME'] + '/.' + domain)
       end
       @config = nil
+      if cmdline
+         cmdlineopt = Longopt.new(optspec.keys)
+      else
+         cmdlineopt = new Hash
+      end
       if cmdlineopt.has_key? 'config'
          @config = cmdlineopt['config']
          raise "File not found: #{cmdlineopt['config']}" unless
