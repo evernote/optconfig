@@ -55,7 +55,7 @@ class Optconfig < Hash
       if cmdline
          cmdlineopt = Longopt.new(optspec.keys)
       else
-         cmdlineopt = new Hash
+         cmdlineopt = {}
       end
       if cmdlineopt.has_key? 'config'
          @config = cmdlineopt['config']
