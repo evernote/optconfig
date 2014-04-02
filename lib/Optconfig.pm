@@ -291,18 +291,20 @@ sub new {
          croak $@;
       }
    }
-
-   for my $file (@$cfgfilepath) {
-      eval {
-         if (-r $file) {
-            $self->{'_config'} = $file;
-            $self->read_config($file);
-            last;
+   else
+   {
+      for my $file (@$cfgfilepath) {
+         eval {
+            if (-r $file) {
+               $self->{'_config'} = $file;
+               $self->read_config($file);
+               last;
+            }
+         };
+         if ($@) {
+            carp "Error reading config file $file: $@";
          }
-      };
-      if ($@) {
-         carp "Error reading config file $file: $@";
-      }
+      }      
    }
 
    for my $opt (keys %$cmdlineopt) {
