@@ -1,5 +1,5 @@
 NAME=optconfig
-VERSION=1.0.3
+VERSION=1.0.4
 RELEASE=1
 SOURCE=$(NAME)-$(VERSION).tar.gz
 ARCH=noarch
