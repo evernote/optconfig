@@ -42,13 +42,13 @@ opt = optconfig.new('domain', { 'force!': 0,
 									'mail' : 'bob@myhost.com'
 								}
 							  })
-if opt{'force!'}:
+if opt['force!']:
 	os.unlink(filefoo)
 
-fh = open(opt{'logfile'}, "w")
+fh = open(opt['logfile'], "w")
 fh.write("Message\n")
 
-for k in opt{'define'}:
+for k in opt['define']:
    print "$key = $opt->{'define'}->{$key}\n";
 }
 
@@ -249,7 +249,7 @@ class Optconfig(object):
 	def croak(self, msg, err = ""):
 		if len(err) > 0:
 			print "%s: %s" % (msg, err)
-		else
+		else:
 			print msg
 		sys.exit(1)
 
@@ -285,13 +285,15 @@ class Optconfig(object):
 		for optspec in submitted_optspec:
 			val = submitted_optspec[optspec]
 			optspecs.push(optspec)
-			# TODO
-			opt, dummy = optspec.split(/[=\!\+]/, $optspec, 2);
+			opt, dummy = re.split("[=\!\+]", optspec, 1);
 			self[opt] = val
 
 		# TODO
-		GetOptions($cmdlineopt, @optspecs);
-
+		#GetOptions($cmdlineopt, @optspecs);
+		opts, args = getopt.getopt(sys.argv[1:], "", optspecs)
+		for i in seq(0, len(opts)):
+			self[opts[i][0]] = opts[i][1]
+			
 		if "HOME" in os.environ:
 			cfgfilepath = [ os.environ['HOME'] + '/.' + domain,
 						'/opt/pptools/etc/' + domain + '.conf' ]
@@ -339,7 +341,7 @@ class Optconfig(object):
 		if opt in self:
 			if type(self[opt]) == types.DictType or type(self[opt]) == types.ListType:
 				if type(self[opt]) == types.DictType:
-					if (type(val) == types.DictType:
+					if type(val) == types.DictType:
 						# Merge, at least one-level
 						for i in val:
 							self[opt][i] = val[i]
@@ -388,14 +390,14 @@ class Optconfig(object):
 		except IOError as e:
 			if death:
 				self.croak(file, e[1])
-			else
+			else:
 				return
 
 		text = "\n".join(f.readlines())
 		f.close()
 		obj = self._from_json(text)
 		for i in obj:
-			self[i] = obj{i}
+			self[i] = obj[i]
 		return obj
 
 	################################################################################	
@@ -434,7 +436,7 @@ class Optconfig(object):
 	# This debugging is controlled by an environment variable, because
 	# it's really orthogonal to the use of a 'debug' option in the constructor
 	# or something like that. -jdb/20100812
-		if os.environ["OPTCONFIG_DEBUG"]:
+		if "OPTCONFIG_DEBUG" in os.environ:
 			print "\nDBG(Optconfig)".join(arg)
 
 	################################################################################	
