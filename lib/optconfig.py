@@ -15,11 +15,11 @@
 # */
 
 myhelp = '''
-=head1 NAME
+NAME
 
 Optconfig - Configure and parse command-line options
 
-=head1 SYNOPSIS
+SYNOPSIS
 
 # Invoking an optconfig program
 
@@ -36,23 +36,23 @@ program [options] arguments...
 import optconfig,sys,os
 
 # Configuration is read from
-opt = optconfig.new('domain', { 'force!': 0, 
-								'logfile=s': '/var/log/foo',
-								'define=s%': {
-									'mail' : 'bob@myhost.com'
-								}
-							  })
-if opt['force!']:
+opt = optconfig.optconfig('domain', { 'force!': 0, 
+	'logfile=s': '/var/log/foo',
+	'define=s%': {
+		'mail' : 'bob@myhost.com'
+	}
+})
+
+if opt['force']:
 	os.unlink(filefoo)
 
 fh = open(opt['logfile'], "w")
 fh.write("Message\n")
 
 for k in opt['define']:
-   print "$key = $opt->{'define'}->{$key}\n";
-}
+   print "%s = %s" % (key, opt['define'][key])
 
-=head1 DESCRIPTION
+DESCRIPTION
 
 The Optconfig module looks in various places for its configuration. It will
 read configuration from I<one> of C<$HOME/.domain>,
@@ -66,59 +66,57 @@ command-line options specified in the option spec.
 There is a standard set of options you can pass (or configure in a config
 file) to Optconfig programs.
 
-=head2 Standard Options
+Standard Options
 
-=over
 
-=item --config=file
+--config=file
+	Optconfig reads the configuration in the named file. The configuration file
+	format is JSON.  If it can't read this file, it complains. If no --config
+	option is specified, it will search for a configuration file in the standard
+	locations as listed above. If it finds a file, it reads it and sets config
+	values accordingly, then overrides or merges these values with the ones on
+	the command line.
+	
+	Some options can be specified multiple times. For example, a --define option
+	might allow you to define more than one key; or a --host option might allow
+	you to define more than one host. If these options appear in the configuration
+	file and the command line, their values are added to by the command line value
+	For example, if you have a configuration file with the following contents:
+	
+	{ "define": { "name": "bob", "home": "/home/bob" }
+  	"host": [ "wiki.ppops.net", "tickets.ppops.net" ] }
+	
+	And you pass C<--define mail=bob@proofpoint.com> C<--host=mail.ppops.net> into
+	the command, the resulting configuration will be:
+	
+	{ "define": { "mail": "bob@proofpoint.com", "name": "bob",
+			  	"home": "/home/bob" },
+  	"host": [ "mail.ppops.net", "wiki.ppops.net", "tickets.ppops.net" ] }
+	
+	Note how the command-line value for C<--host> is prepended to the list.
+	
+--verbose
+	
+	Produce verbose output. You can specify this a number of times indicating
+	increased verbosity.
 
-Optconfig reads the configuration in the named file. The configuration file
-format is JSON.  If it can't read this file, it complains. If no --config
-option is specified, it will search for a configuration file in the standard
-locations as listed above. If it finds a file, it reads it and sets config
-values accordingly, then overrides or merges these values with the ones on
-the command line.
+--dry-run
 
-Some options can be specified multiple times. For example, a --define option
-might allow you to define more than one key; or a --host option might allow
-you to define more than one host. If these options appear in the configuration
-file and the command line, their values are added to by the command line value
-For example, if you have a configuration file with the following contents:
+	The command will print what it would have done, but won't change anything in
+	databases or on disk.
 
-{ "define": { "name": "bob", "home": "/home/bob" }
-  "host": [ "wiki.ppops.net", "tickets.ppops.net" ] }
+--version
 
-And you pass C<--define mail=bob@proofpoint.com> C<--host=mail.ppops.net> into
-the command, the resulting configuration will be:
+	Print the program version.
 
-{ "define": { "mail": "bob@proofpoint.com", "name": "bob",
-			  "home": "/home/bob" },
-  "host": [ "mail.ppops.net", "wiki.ppops.net", "tickets.ppops.net" ] }
+--help
 
-Note how the command-line value for C<--host> is prepended to the list.
+	Print a help message.
 
-=item --verbose
+--debug
 
-Produce verbose output. You can specify this a number of times indicating
-increased verbosity.
-
-=item --dry-run
-
-The command will print what it would have done, but won't change anything in
-databases or on disk.
-
-=item --version
-
-Print the program version.
-
-=item --help
-
-Print a help message.
-
-=item --debug
-
-Producing debugging output. You can specify this a number of times indicating
-increased debugging output volume.
+	Producing debugging output. You can specify this a number of times indicating
+	increased debugging output volume.
 
 =back
 
@@ -131,6 +129,14 @@ increased debugging output volume.
 =item config=s
 
 The config file is a string. You don't have to do anything with it.
+
+=item stuff=s@
+
+Stuff is a list. You don't have to do anything with it.
+
+=item stuff=s%
+
+Stuff is a dictionary. You don't have to do anything with it.
 
 =item verbose+
 
@@ -147,10 +153,11 @@ and/or use the L<vrb()> method.
 This is a boolean indicating whether a dry run is happening. You need to test
 this when performing operations that would change persistent data. For example:
 
-my $sth = $dbh->prepare("DROP TABLE $tab");
-$opt->vrb(1, "Dropping table users");
-$sth->execute() unless $opt->{'dry-run'};
-$sth->finish();
+sth = dbh.prepare("DROP TABLE %s" % (tablename))
+opt.vrb(1, "Dropping table users")
+if not opt['dry-run']:
+	sth.execute()
+sth.finish()
 
 =item version
 
@@ -167,7 +174,7 @@ it out.
 
 =over 4
 
-=item new($domain, \%options)
+=item __init__(domain, options)
 
 Parse command-line options and configuration files using $domain.
 
@@ -267,7 +274,7 @@ class optconfig:
 
 	################################################################################	
 	def __setitem__(self, key, val):
-		print "setting %s to %s" % (key, val)
+		#print "setting %s to %s" % (key, val)
 		self._stuff[key] = val
 
 	################################################################################	
@@ -317,18 +324,18 @@ class optconfig:
 				getopt_arg.append(opt[0])
 			self[opt[0]] = val
 
-		print "dictopts %s" % (dictopts)
-		print "listopts %s" % (listopts)
-		print "stringopts %s" % (stringopts)
-		print "intopts %s" % (intopts)
-		print "boolopts %s" % (boolopts)
+		#print "dictopts %s" % (dictopts)
+		#print "listopts %s" % (listopts)
+		#print "stringopts %s" % (stringopts)
+		#print "intopts %s" % (intopts)
+		#print "boolopts %s" % (boolopts)
 			
 
 		# So.. we need to read files first, then override from cmdline
 		# TODO
 		#GetOptions($cmdlineopt, @optspecs);
-		print "optspecs: %s" % (optspecs)
-		print "getopt_arg: %s" % (getopt_arg)
+		#print "optspecs: %s" % (optspecs)
+		#print "getopt_arg: %s" % (getopt_arg)
 
 		cmdline_parsed = {}
 				
@@ -339,7 +346,7 @@ class optconfig:
 				cmdline_parsed[optname] = cmdlineopt[i][1]
 			elif optname in dictopts:
 				cmdline_parsed[optname] = json.loads(cmdlineopt[i][1])
-				print "loaded dict from %s" % (cmdlineopt[i][1])
+				#print "loaded dict from %s" % (cmdlineopt[i][1])
 			elif optname in listopts:
 				cmdline_parsed[optname] = re.split("[, ]", cmdlineopt[i][1])
 			elif optname in intopts:
@@ -370,7 +377,7 @@ class optconfig:
 			self._merge_cmdlineopt(opt, cmdline_parsed[opt])
 
 		# TODO - not really necessary but.. might be nice
-		#$self->ocdbg(Data::Dumper->Dump([$self], ['optconfig']));
+		#self.ocdbg(self['optconfig']));
 
 		if self['version']:
 			print self.VERSION
@@ -434,7 +441,7 @@ class optconfig:
 	# TODO: read_config should be cognizant of the option types, in particular
 	# things like =s@.
 	def _read_config(self, file, death):
-		print "reading config file %s" % (file)
+		#print "reading config file %s" % (file)
 		try:
 			f = open(file, "r")
 		except IOError as e:
