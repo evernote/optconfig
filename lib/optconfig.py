@@ -228,10 +228,15 @@ Python port by Eric Robbins, erobbins@evernote.com
 '''
 
 ################################################################################	
-import sys,os,json,types
+import sys
+import os
+import json
+import types
+import re
+import getopt
 
 ################################################################################	
-class Optconfig(object):
+class optconfig:
 
 	VERSION = 1.0
 
@@ -254,19 +259,21 @@ class Optconfig(object):
 		sys.exit(1)
 
 	################################################################################	
-	def _add_standard_opts(optspec):
-		for i in standard_opts:
+	def _add_standard_opts(self, optspec):
+		for i in self.standard_opts:
 			if i not in optspec:
-				optspec[i] = standard_opts[i]
+				optspec[i] = self.standard_opts[i]
 		return optspec
 
 	################################################################################	
 	def __setitem__(self, key, val):
-		self._stuff['key'] = val
+		self._stuff[key] = val
 
 	################################################################################	
 	def __getitem__(self, key):
-		return self._stuff['key']
+		if key in self._stuff:
+			return self._stuff[key]
+		return False
 
 	################################################################################	
 	def __contains__(self, key):
@@ -275,23 +282,23 @@ class Optconfig(object):
 		return False
 
 	################################################################################	
-	def new(self, myclass, domain, submitted_optspec):
+	def __init__(self, domain, submitted_optspec):
 		self['_domain'] = domain
-		self['_optspec'] = _add_standard_opts(submitted_optspec)
+		self['_optspec'] = self._add_standard_opts(submitted_optspec)
 		cmdlineopt = {}
 		defval = {}
 		optspecs = []
 	
 		for optspec in submitted_optspec:
 			val = submitted_optspec[optspec]
-			optspecs.push(optspec)
-			opt, dummy = re.split("[=\!\+]", optspec, 1);
-			self[opt] = val
+			optspecs.append(optspec)
+			opt = re.split("[=\!\+]", optspec, 1);
+			self[opt[0]] = val
 
 		# TODO
 		#GetOptions($cmdlineopt, @optspecs);
 		opts, args = getopt.getopt(sys.argv[1:], "", optspecs)
-		for i in seq(0, len(opts)):
+		for i in range(0, len(opts)):
 			self[opts[i][0]] = opts[i][1]
 			
 		if "HOME" in os.environ:
@@ -303,36 +310,34 @@ class Optconfig(object):
 		self['_config'] = False
 		gotconfig = False;
 
-		if config in cmdlineopt:
-			gotconfig = self.read_config(cmdlineopt['config'], True)
+		if "config" in cmdlineopt:
+			gotconfig = self._read_config(cmdlineopt['config'], True)
 
 		for file in cfgfilepath:
 			self['_config'] = file
-			rval = self.read_config(file, False)
+			rval = self._read_config(file, False)
 			if gotconfig == False:
 				gotconfig = rval
 
 		if gotconfig == False:
-			croak("no valid configuration file found")
+			self.croak("no valid configuration file found")
 
 		for opt in cmdlineopt:
-			self.merge_cmdlineopt(opt, cmdlineopt[opt])
+			self._merge_cmdlineopt(opt, cmdlineopt[opt])
 
 		# TODO - not really necessary but.. might be nice
 		#$self->ocdbg(Data::Dumper->Dump([$self], ['optconfig']));
 
-		if self['version']:
+		if "version" in self and int(self['version']) != 0:
 			print self.VERSION
 			sys.exit(0)
 
-		if self['help']:
+		if help in self and int(self['help']) != 0:
 			print myhelp
 			sys.exit(0)
 
-		return self
-
 	################################################################################	
-	def merge_cmdlineopt(self, opt, val):
+	def _merge_cmdlineopt(self, opt, val):
 	# This logic is based on the value of the existing (configured) option value
 	# but it should be based on the type of the optspec. -jdb/20100812
 
@@ -384,7 +389,7 @@ class Optconfig(object):
 	################################################################################	
 	# TODO: read_config should be cognizant of the option types, in particular
 	# things like =s@.
-	def read_config(self, file, death):
+	def _read_config(self, file, death):
 		try:
 			f = open(file, "r")
 		except IOError as e:
@@ -401,11 +406,11 @@ class Optconfig(object):
 		return obj
 
 	################################################################################	
-	def _from_json(str):
+	def _from_json(self, str):
 		return json.loads(str)
 
 	################################################################################	
-	def _to_json(obj):
+	def _to_json(self, obj):
 		return json.dumps(obj)
 
 	################################################################################	
@@ -422,17 +427,17 @@ class Optconfig(object):
 	#
 	################################################################################	
 	def vrb(self, level, msg):
-		if level <= self.verbose:
+		if level <= int(self['verbose']):
 			print "\n".join(msg)
 
 	################################################################################	
 	def dbg(self, level, msg):
- 		if level <= self.debug:
+ 		if level <= int(self['debug']):
 			dbgstr = "\nDBG(%s)" % (self._domain)
 			print "%s: %s" % (dbgstr, dbgstr.join(msg))
 
 	################################################################################	
-	def ocdbg(arg):
+	def ocdbg(self, arg):
 	# This debugging is controlled by an environment variable, because
 	# it's really orthogonal to the use of a 'debug' option in the constructor
 	# or something like that. -jdb/20100812
