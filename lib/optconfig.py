@@ -245,7 +245,7 @@ class optconfig:
 		'debug+':   0,
 		'verbose+': 0,
 		'version':  0,
-		'help':     0,
+		'help':    0,
 		'dry-run!': 0 
 	}
 	_stuff = {}
@@ -267,6 +267,7 @@ class optconfig:
 
 	################################################################################	
 	def __setitem__(self, key, val):
+		print "setting %s to %s" % (key, val)
 		self._stuff[key] = val
 
 	################################################################################	
@@ -288,51 +289,94 @@ class optconfig:
 		cmdlineopt = {}
 		defval = {}
 		optspecs = []
+		stringopts = []
+		boolopts = []
+		intopts = []
+		listopts = []
+		dictopts = []
+		getopt_arg = []
 	
 		for optspec in submitted_optspec:
 			val = submitted_optspec[optspec]
 			optspecs.append(optspec)
 			opt = re.split("[=\!\+]", optspec, 1);
+			if "=s%" in optspec:
+				dictopts.append(opt[0])
+				getopt_arg.append(opt[0] + "=")
+			elif "=s@" in optspec:
+				listopts.append(opt[0])
+				getopt_arg.append(opt[0] + "=")
+			elif "=" in optspec:
+				stringopts.append(opt[0])
+				getopt_arg.append(opt[0] + "=")
+			elif "+" in optspec:
+				intopts.append(opt[0])
+				getopt_arg.append(opt[0] + "=")
+			else:
+				boolopts.append(opt[0])
+				getopt_arg.append(opt[0])
 			self[opt[0]] = val
 
+		print "dictopts %s" % (dictopts)
+		print "listopts %s" % (listopts)
+		print "stringopts %s" % (stringopts)
+		print "intopts %s" % (intopts)
+		print "boolopts %s" % (boolopts)
+			
+
+		# So.. we need to read files first, then override from cmdline
 		# TODO
 		#GetOptions($cmdlineopt, @optspecs);
-		opts, args = getopt.getopt(sys.argv[1:], "", optspecs)
-		for i in range(0, len(opts)):
-			self[opts[i][0]] = opts[i][1]
-			
-		if "HOME" in os.environ:
-			cfgfilepath = [ os.environ['HOME'] + '/.' + domain,
-						'/opt/pptools/etc/' + domain + '.conf' ]
-		else:
-			cfgfilepath = [ '/opt/pptools/etc/' + domain + '.conf' ]
+		print "optspecs: %s" % (optspecs)
+		print "getopt_arg: %s" % (getopt_arg)
 
-		self['_config'] = False
+		cmdline_parsed = {}
+				
+		cmdlineopt, args = getopt.getopt(sys.argv[1:], "", getopt_arg)
+		for i in range(0, len(cmdlineopt)):
+			optname = cmdlineopt[i][0][2:]
+			if optname in stringopts:
+				cmdline_parsed[optname] = cmdlineopt[i][1]
+			elif optname in dictopts:
+				cmdline_parsed[optname] = json.loads(cmdlineopt[i][1])
+				print "loaded dict from %s" % (cmdlineopt[i][1])
+			elif optname in listopts:
+				cmdline_parsed[optname] = re.split("[, ]", cmdlineopt[i][1])
+			elif optname in intopts:
+				cmdline_parsed[optname] = int(cmdlineopt[i][1])
+			else:
+				cmdline_parsed[optname] = True
+
+		# First, load global file, then load $HOME file	
+		cfgfilepath = [ '/opt/pptools/etc/' + domain + '.conf' ]
+		if "HOME" in os.environ:
+			cfgfilepath.append(os.environ['HOME'] + '/.' + domain)
+
+		self['config'] = False
 		gotconfig = False;
 
-		if "config" in cmdlineopt:
-			gotconfig = self._read_config(cmdlineopt['config'], True)
-
 		for file in cfgfilepath:
-			self['_config'] = file
+			self['config'] = file
 			rval = self._read_config(file, False)
 			if gotconfig == False:
 				gotconfig = rval
 
-		if gotconfig == False:
-			self.croak("no valid configuration file found")
+		# now overwrite defaults with command line config file.. 
+		if "config" in cmdline_parsed:
+			cmdlinefile_config = self._read_config(cmdline_parsed['config'], True)
 
-		for opt in cmdlineopt:
-			self._merge_cmdlineopt(opt, cmdlineopt[opt])
+		# now merge/override command line stuff
+		for opt in cmdline_parsed:
+			self._merge_cmdlineopt(opt, cmdline_parsed[opt])
 
 		# TODO - not really necessary but.. might be nice
 		#$self->ocdbg(Data::Dumper->Dump([$self], ['optconfig']));
 
-		if "version" in self and int(self['version']) != 0:
+		if self['version']:
 			print self.VERSION
 			sys.exit(0)
 
-		if help in self and int(self['help']) != 0:
+		if self['help']:
 			print myhelp
 			sys.exit(0)
 
@@ -390,13 +434,14 @@ class optconfig:
 	# TODO: read_config should be cognizant of the option types, in particular
 	# things like =s@.
 	def _read_config(self, file, death):
+		print "reading config file %s" % (file)
 		try:
 			f = open(file, "r")
 		except IOError as e:
 			if death:
 				self.croak(file, e[1])
 			else:
-				return
+				return False
 
 		text = "\n".join(f.readlines())
 		f.close()
