@@ -19,7 +19,7 @@ require 'rbconfig'
 
 rubylib = [ ]
 saved_rubylib = [ ]
-if $LOAD_PATH[0] == "/opt/pptools"
+if $LOAD_PATH[0] == "/usr/local"
    $LOAD_PATH.shift
 end
 if ENV.has_key? 'RUBYLIB' and ! ENV['RUBYLIB'].empty?
@@ -30,10 +30,10 @@ if ENV.has_key? 'RUBYLIB' and ! ENV['RUBYLIB'].empty?
    end
 end
 
-$LOAD_PATH.unshift("/opt/pptools/lib/ruby/#{RbConfig::CONFIG['ruby_version']}/#{RbConfig::CONFIG['sitearch']}")
-$LOAD_PATH.unshift("/opt/pptools/lib/ruby/#{RbConfig::CONFIG['ruby_version']}")
-$LOAD_PATH.unshift('/opt/pptools/lib/ruby')
-$LOAD_PATH.unshift('/opt/pptools/lib')
+$LOAD_PATH.unshift("/usr/local/lib/ruby/#{RbConfig::CONFIG['ruby_version']}/#{RbConfig::CONFIG['sitearch']}")
+$LOAD_PATH.unshift("/usr/local/lib/ruby/#{RbConfig::CONFIG['ruby_version']}")
+$LOAD_PATH.unshift('/usr/local/lib/ruby')
+$LOAD_PATH.unshift('/usr/local/lib')
 
 if ! saved_rubylib.empty?
    $LOAD_PATH.unshift(*saved_rubylib)

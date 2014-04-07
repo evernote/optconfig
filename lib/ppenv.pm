@@ -16,18 +16,18 @@
 
 
 # @INC now is like this:
-# /opt/pptools, PERLLIB-dirs, system-lib-dirs
-# I need to get rid of /opt/pptools
+# /usr/local, PERLLIB-dirs, system-lib-dirs
+# I need to get rid of /usr/local
 # I need to save the dirs that came from PERLLIB
-# Put /opt/pptools/lib ahead of all the system libpath dirs
+# Put /usr/local/lib ahead of all the system libpath dirs
 # and put back PERLLIB dirs. Otherwise, you'll never be able
-# to override modules in /opt/pptools/lib
-# use lib '/opt/pptools/lib';
+# to override modules in /usr/local/lib
+# use lib '/usr/local/lib';
 use Config;
 BEGIN {
    no warnings;
 
-   if ($INC[0] eq '/opt/pptools') {
+   if ($INC[0] eq '/usr/local') {
       shift(@INC);
    }
    my @perllib = ();
@@ -58,10 +58,10 @@ BEGIN {
    }
 
    for my $libpath (keys %libpath) {
-      $libpath =~ s{^(.*?)(lib64|lib)}{/opt/pptools/$2};
+      $libpath =~ s{^(.*?)(lib64|lib)}{/usr/local/$2};
       unshift(@INC, $libpath);
    }
-   unshift(@INC, '/opt/pptools/lib');
+   unshift(@INC, '/usr/local/lib');
    unshift(@INC, @saved_perllib);
 }
 
