@@ -14,49 +14,49 @@
 # limitations under the License.
 # */
 
-myhelp = '''
-NAME
+'''
+=head1 NAME
 
 Optconfig - Configure and parse command-line options
 
-SYNOPSIS
+=head1 SYNOPSIS
 
-# Invoking an optconfig program
+   # Invoking an optconfig program
 
-program [options] arguments...
-   --config=file	Use file for configuration
-   --verbose		Produce verbose output
-   --dry-run		Do a dry run (don't change things)
-   --version		Print program version number
-   --help		   Print usage message
-   --debug		  Produce debugging output
-   Some programs will have options specific to them
+   program [options] arguments...
+      --config=file    Use file for configuration
+      --verbose        Produce verbose output
+      --dry-run        Do a dry run (don't change things)
+      --version        Print program version number
+      --help           Print usage message
+      --debug          Produce debugging output
+      Some programs will have options specific to them
 
 # In optconfig program
-import optconfig,sys,os
+   import optconfig,sys,os
 
 # Configuration is read from
-opt = optconfig.optconfig('domain', { 'force!': 0, 
-	'logfile=s': '/var/log/foo',
-	'define=s%': {
-		'mail' : 'bob@myhost.com'
-	}
-})
+   opt = optconfig.optconfig('domain', { 'force!': 0, 
+      'logfile=s': '/var/log/foo',
+      'define=s%': {
+         'mail' : 'bob@myhost.com'
+      }
+   })
 
-if opt['force']:
-	os.unlink(filefoo)
+   if opt['force']:
+      os.unlink(filefoo)
 
-fh = open(opt['logfile'], "w")
-fh.write("Message\n")
+   fh = open(opt['logfile'], "w")
+   fh.write("Message\n")
 
-for k in opt['define']:
-   print "%s = %s" % (key, opt['define'][key])
+   for k in opt['define']:
+      print "%s = %s" % (key, opt['define'][key])
 
-DESCRIPTION
+=head1 DESCRIPTION
 
 The Optconfig module looks in various places for its configuration. It will
 read configuration from I<one> of C<$HOME/.domain>,
-C</opt/pptools/etc/domain.conf> and the configuration file (if any) specified
+C</usr/local/etc/domain.conf> and the configuration file (if any) specified
 with the B<--config> command-line option.
 
 The whole configuration is read from the file (even if the option spec doesn't
@@ -66,57 +66,59 @@ command-line options specified in the option spec.
 There is a standard set of options you can pass (or configure in a config
 file) to Optconfig programs.
 
-Standard Options
+=head2 Standard Options
 
+=over
 
---config=file
-	Optconfig reads the configuration in the named file. The configuration file
-	format is JSON.  If it can't read this file, it complains. If no --config
-	option is specified, it will search for a configuration file in the standard
-	locations as listed above. If it finds a file, it reads it and sets config
-	values accordingly, then overrides or merges these values with the ones on
-	the command line.
-	
-	Some options can be specified multiple times. For example, a --define option
-	might allow you to define more than one key; or a --host option might allow
-	you to define more than one host. If these options appear in the configuration
-	file and the command line, their values are added to by the command line value
-	For example, if you have a configuration file with the following contents:
-	
-	{ "define": { "name": "bob", "home": "/home/bob" }
-  	"host": [ "wiki.ppops.net", "tickets.ppops.net" ] }
-	
-	And you pass C<--define mail=bob@proofpoint.com> C<--host=mail.ppops.net> into
-	the command, the resulting configuration will be:
-	
-	{ "define": { "mail": "bob@proofpoint.com", "name": "bob",
-			  	"home": "/home/bob" },
-  	"host": [ "mail.ppops.net", "wiki.ppops.net", "tickets.ppops.net" ] }
-	
-	Note how the command-line value for C<--host> is prepended to the list.
-	
---verbose
-	
-	Produce verbose output. You can specify this a number of times indicating
-	increased verbosity.
+=item --config=file
 
---dry-run
+Optconfig reads the configuration in the named file. The configuration file
+format is JSON.  If it can't read this file, it complains. If no --config
+option is specified, it will search for a configuration file in the standard
+locations as listed above. If it finds a file, it reads it and sets config
+values accordingly, then overrides or merges these values with the ones on
+the command line.
 
-	The command will print what it would have done, but won't change anything in
-	databases or on disk.
+Some options can be specified multiple times. For example, a --define option
+might allow you to define more than one key; or a --host option might allow
+you to define more than one host. If these options appear in the configuration
+file and the command line, their values are added to by the command line value
+For example, if you have a configuration file with the following contents:
 
---version
+   { "define": { "name": "bob", "home": "/home/bob" }
+     "host": [ "wiki.ppops.net", "tickets.ppops.net" ] }
 
-	Print the program version.
+And you pass C<--define mail=bob@proofpoint.com> C<--host=mail.ppops.net> into
+the command, the resulting configuration will be:
 
---help
+   { "define": { "mail": "bob@proofpoint.com", "name": "bob",
+                 "home": "/home/bob" },
+     "host": [ "mail.ppops.net", "wiki.ppops.net", "tickets.ppops.net" ] }
 
-	Print a help message.
+Note how the command-line value for C<--host> is prepended to the list.
 
---debug
+=item --verbose
 
-	Producing debugging output. You can specify this a number of times indicating
-	increased debugging output volume.
+Produce verbose output. You can specify this a number of times indicating
+increased verbosity.
+
+=item --dry-run
+
+The command will print what it would have done, but won't change anything in
+databases or on disk.
+
+=item --version
+
+Print the program version.
+
+=item --help
+
+Print a help message.
+
+=item --debug
+
+Producing debugging output. You can specify this a number of times indicating
+increased debugging output volume.
 
 =back
 
@@ -129,14 +131,6 @@ Standard Options
 =item config=s
 
 The config file is a string. You don't have to do anything with it.
-
-=item stuff=s@
-
-Stuff is a list. You don't have to do anything with it.
-
-=item stuff=s%
-
-Stuff is a dictionary. You don't have to do anything with it.
 
 =item verbose+
 
@@ -153,11 +147,10 @@ and/or use the L<vrb()> method.
 This is a boolean indicating whether a dry run is happening. You need to test
 this when performing operations that would change persistent data. For example:
 
-sth = dbh.prepare("DROP TABLE %s" % (tablename))
-opt.vrb(1, "Dropping table users")
-if not opt['dry-run']:
-	sth.execute()
-sth.finish()
+   my $sth = $dbh->prepare("DROP TABLE $tab");
+   $opt->vrb(1, "Dropping table users");
+   $sth->execute() unless $opt->{'dry-run'};
+   $sth->finish();
 
 =item version
 
@@ -174,7 +167,7 @@ it out.
 
 =over 4
 
-=item __init__(domain, options)
+=item new($domain, \%options)
 
 Parse command-line options and configuration files using $domain.
 
@@ -221,7 +214,7 @@ file) whereas it should honor only the optspec.
 =head1 AUTHOR
 
 Jeremy Brinkley, E<lt>jbrinkley@proofpoint.comE<gt>
-Python port by Eric Robbins, erobbins@evernote.com
+Python version by Eric Robbins, E<lt>erobbins@evernote.comE<gt>
 
 =head1 SEE ALSO
 
@@ -234,7 +227,7 @@ Python port by Eric Robbins, erobbins@evernote.com
 =cut
 '''
 
-################################################################################	
+################################################################################
 import sys
 import os
 import json
@@ -242,22 +235,23 @@ import types
 import re
 import getopt
 
-################################################################################	
+################################################################################
 class optconfig:
 
-	VERSION = 1.0
+	#VERSION = 1.0
+	_default_config_dir = "/usr/local/etc"
 
 	standard_opts = {
 		'config=s': False,
 		'debug+':   0,
 		'verbose+': 0,
-		'version':  0,
-		'help':    0,
+		'version':  False,
+		'help':    False,
 		'dry-run!': 0 
 	}
 	_stuff = {}
 
-	################################################################################	
+	################################################################################
 	def croak(self, msg, err = ""):
 		if len(err) > 0:
 			print "%s: %s" % (msg, err)
@@ -265,34 +259,64 @@ class optconfig:
 			print msg
 		sys.exit(1)
 
-	################################################################################	
+	################################################################################
+	def do_help(self):
+		doc = ""
+		exepath = sys.argv[0]
+		try:
+			#print "opening %s" % (exepath)
+			f = open(exepath)
+		except BaseException as e:
+			return
+
+		docstart = 0
+		for i in f.readlines():
+			if i[0:6] == "=head1":
+				docstart = 1
+			elif i[0:4] == "=cut":
+				doc += i
+				docstart = 0
+			if docstart:
+				doc += i
+		if doc != "":
+			#print doc
+			# pod2man | nroff -man | more
+			import subprocess
+			s = subprocess.Popen("pod2man | nroff -man", shell = True, stdin = subprocess.PIPE, stdout = subprocess.PIPE)
+			out, err = s.communicate(doc)
+			print out
+
+		return
+
+	################################################################################
 	def _add_standard_opts(self, optspec):
 		for i in self.standard_opts:
 			if i not in optspec:
 				optspec[i] = self.standard_opts[i]
 		return optspec
 
-	################################################################################	
+	################################################################################
 	def __setitem__(self, key, val):
 		#print "setting %s to %s" % (key, val)
 		self._stuff[key] = val
 
-	################################################################################	
+	################################################################################
 	def __getitem__(self, key):
 		if key in self._stuff:
 			return self._stuff[key]
 		return False
 
-	################################################################################	
+	################################################################################
 	def __contains__(self, key):
 		if key in self._stuff:
 			return True
 		return False
 
-	################################################################################	
+	################################################################################
 	def __init__(self, domain, submitted_optspec):
 		self['_domain'] = domain
 		self['_optspec'] = self._add_standard_opts(submitted_optspec)
+		
 		cmdlineopt = {}
 		defval = {}
 		optspecs = []
@@ -355,22 +379,26 @@ class optconfig:
 				cmdline_parsed[optname] = True
 
 		# First, load global file, then load $HOME file	
-		cfgfilepath = [ '/opt/pptools/etc/' + domain + '.conf' ]
+		cfgfilepath = []
 		if "HOME" in os.environ:
 			cfgfilepath.append(os.environ['HOME'] + '/.' + domain)
+		cfgfilepath.append(self._default_config_dir + "/" + domain + '.conf')
 
 		self['config'] = False
 		gotconfig = False;
 
-		for file in cfgfilepath:
-			self['config'] = file
-			rval = self._read_config(file, False)
-			if gotconfig == False:
-				gotconfig = rval
-
-		# now overwrite defaults with command line config file.. 
+		# either read command line config file.. 
 		if "config" in cmdline_parsed:
 			cmdlinefile_config = self._read_config(cmdline_parsed['config'], True)
+			gotconfig = True
+		# or read one of the default config files
+		else:
+			for file in cfgfilepath:
+				self['config'] = file
+				if gotconfig == False:
+					rval = self._read_config(file, False)
+				if gotconfig == False:
+					gotconfig = rval
 
 		# now merge/override command line stuff
 		for opt in cmdline_parsed:
@@ -379,15 +407,20 @@ class optconfig:
 		# TODO - not really necessary but.. might be nice
 		#self.ocdbg(self['optconfig']));
 
+
 		if self['version']:
-			print self.VERSION
+			try:
+				print VERSION
+			except BaseException as e:
+				print "ERROR: VERSION not defined"
+				sys.exit(1)
 			sys.exit(0)
 
 		if self['help']:
-			print myhelp
+			self.do_help()
 			sys.exit(0)
 
-	################################################################################	
+	################################################################################
 	def _merge_cmdlineopt(self, opt, val):
 	# This logic is based on the value of the existing (configured) option value
 	# but it should be based on the type of the optspec. -jdb/20100812
@@ -437,7 +470,7 @@ class optconfig:
 
 		return self[opt]
 
-	################################################################################	
+	################################################################################
 	# TODO: read_config should be cognizant of the option types, in particular
 	# things like =s@.
 	def _read_config(self, file, death):
@@ -457,15 +490,15 @@ class optconfig:
 			self[i] = obj[i]
 		return obj
 
-	################################################################################	
+	################################################################################
 	def _from_json(self, str):
 		return json.loads(str)
 
-	################################################################################	
+	################################################################################
 	def _to_json(self, obj):
 		return json.dumps(obj)
 
-	################################################################################	
+	################################################################################
 	# TODO - not sure what this is for/where it is used/why it's here.
 	#def hash(self):
 	#
@@ -477,18 +510,18 @@ class optconfig:
 	#
 	#		return $hash;
 	#
-	################################################################################	
+	################################################################################
 	def vrb(self, level, msg):
 		if level <= int(self['verbose']):
 			print "\n".join(msg)
 
-	################################################################################	
+	################################################################################
 	def dbg(self, level, msg):
  		if level <= int(self['debug']):
 			dbgstr = "\nDBG(%s)" % (self._domain)
 			print "%s: %s" % (dbgstr, dbgstr.join(msg))
 
-	################################################################################	
+	################################################################################
 	def ocdbg(self, arg):
 	# This debugging is controlled by an environment variable, because
 	# it's really orthogonal to the use of a 'debug' option in the constructor
@@ -496,5 +529,5 @@ class optconfig:
 		if "OPTCONFIG_DEBUG" in os.environ:
 			print "\nDBG(Optconfig)".join(arg)
 
-	################################################################################	
+	################################################################################
 	# end Optconfig class
