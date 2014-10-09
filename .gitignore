@@ -1,0 +1,7 @@
+_build/
+Build
+*.tar.gz
+*.gem
+MANIFEST.SKIP.bak
+META.*
+MYMETA.*

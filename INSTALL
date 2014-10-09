@@ -1,5 +1,0 @@
-Installation Instructions (basic)
-
-* Copy lib/*.rb to a Ruby library location
-* Copy lib/*.pm to a Perl library location
-* Copy optconfig.sh, showconfig to a binary location

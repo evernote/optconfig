@@ -1,5 +1,6 @@
 #!bash
 # /* Copyright 2013 Proofpoint, Inc. All rights reserved.
+#    Copyright 2014 Evernote Corp. All rights reserved.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,8 +32,6 @@ opt_new_gen()
    optspec="$1"
    shift 1
    ruby \
-      -e '$LOAD_PATH.unshift("/usr/local")' \
-      -e 'require "ppenv"' \
       -e 'require "optconfig"' \
       -e 'require "json"' \
       -e 'require "bashon"' \
@@ -54,8 +53,6 @@ opt_new_gen()
 json2bashon_gen()
 {
    ruby \
-      -e '$LOAD_PATH.unshift("/usr/local")' \
-      -e 'require "ppenv"' \
       -e 'require "bashon"' \
       -e 'require "json"' \
       -e 'name = ARGV.shift' \
@@ -125,7 +122,7 @@ invocations before you reach a simple value.
 
 =head1 AUTHOR
 
-Jeremy Brinkley, E<lt>jbrinkely@proofpoint.comE<gt>
+Jeremy Brinkley, E<lt>jbrinkley@evernote.comE<gt>
 
 =cut
 EOF

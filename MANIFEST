@@ -1,0 +1,10 @@
+bin/showconfig
+Build.PL
+lib/Optconfig.pm
+lib/optconfig.sh
+LICENSE
+MANIFEST			This list of files
+optconfig.pod
+reference.rst
+META.yml
+META.json

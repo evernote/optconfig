@@ -1,5 +1,6 @@
 #!perl
 # /* Copyright 2013 Proofpoint, Inc. All rights reserved.
+#    Copyright 2014 Evernote Corp. All rights reserved.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -83,12 +84,12 @@ For example, if you have a configuration file with the following contents:
    { "define": { "name": "bob", "home": "/home/bob" }
      "host": [ "wiki.ppops.net", "tickets.ppops.net" ] }
 
-And you pass C<--define mail=bob@proofpoint.com> C<--host=mail.ppops.net> into
+And you pass C<--define mail=bob@opsexample.com> C<--host=mail.opsexample.net> into
 the command, the resulting configuration will be:
 
-   { "define": { "mail": "bob@proofpoint.com", "name": "bob",
+   { "define": { "mail": "bob@opsexample.com", "name": "bob",
                  "home": "/home/bob" },
-     "host": [ "mail.ppops.net", "wiki.ppops.net", "tickets.ppops.net" ] }
+     "host": [ "mail.opsexample.net", "wiki.opsexample.net", "tickets.opsexample.net" ] }
 
 Note how the command-line value for C<--host> is prepended to the list.
 
@@ -208,7 +209,7 @@ file) whereas it should honor only the optspec.
 
 =head1 AUTHOR
 
-Jeremy Brinkley, E<lt>jbrinkley@proofpoint.comE<gt>
+Jeremy Brinkley, E<lt>jbrinkley@evernote.comE<gt>
 
 =head1 SEE ALSO
 
@@ -230,7 +231,10 @@ use Carp;
 use File::Spec;
 use FindBin;
 
-use vars qw($standard_opts);
+use vars qw($VERSION $standard_opts);
+
+# It's okay that this is distinct from the other libraries. Mostly -jdb/20141008
+$VERSION = '1.1';
 
 BEGIN {
    $standard_opts = {

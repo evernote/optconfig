@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# /* Copyright 2013 Proofpoint, Inc. All rights reserved.
+# /* Copyright 2014 Evernote Corp. All rights reserved.
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -220,7 +220,7 @@ file) whereas it should honor only the optspec.
 
 =head1 AUTHOR
 
-Jeremy Brinkley, E<lt>jbrinkley@proofpoint.comE<gt>
+Jeremy Brinkley, E<lt>jbrinkley@evernote.comE<gt>
 Python port by Eric Robbins, erobbins@evernote.com
 
 =head1 SEE ALSO
