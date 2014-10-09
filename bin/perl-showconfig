@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+# Copyright 2014 Evernote Corp. All rights reserved.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+use Optconfig;
+use JSON;
+
+print "Using ", $INC{'Optconfig.pm'}, "\n";
+
+my $domain = shift(@ARGV);
+my $spectext = shift(@ARGV);
+my $optspec = ($JSON::VERSION >= 2.0 ? from_json($spectext) : jsonToObj($spectext));
+my $opt = Optconfig->new($domain, $optspec);
+
+print(($JSON::VERSION >= 2.0 ? to_json($opt->hash) : objToJson($opt->hash)), "\n");
+
+=head1 NAME
+
+showconfig - Display the standard configuration resulting from given options
+
+=head1 SYNOPSIS
+
+   perl-showconfig domain optspec [options]
+
+=head1 DESCRIPTION
+
+The standard Optconfig system provides a way to configure program execution
+in the context specified by domain.
+
+The optspec is a JSON-serialized option specifier (see L<Optconfig>). Other
+arguments are passed to the optconfig module (perl or ruby) to determine the
+final configuration.
+
+=head1 AUTHOR
+
+Jeremy Brinkley, E<lt>jbrinkley@evernote.comE<gt>
+
+=cut
