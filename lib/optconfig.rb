@@ -47,7 +47,8 @@ class Optconfig < Hash
          opt, dummy = optspec.split(/[\=\+\!]/, 2)
          self[opt] = val
       end
-      cfgfilepath = [ '/usr/local/etc/' + domain + '.conf' ]
+       cfgfilepath = [ '/usr/local/etc/' + domain + '.conf',
+           '/etc/' + domain + '.conf' ]
 
       if ENV.has_key? 'HOME' and ! ENV['HOME'].nil?
          cfgfilepath.unshift(ENV['HOME'] + '/.' + domain)

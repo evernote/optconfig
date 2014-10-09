@@ -56,7 +56,7 @@ DESCRIPTION
 
 The Optconfig module looks in various places for its configuration. It will
 read configuration from I<one> of C<$HOME/.domain>,
-C</opt/pptools/etc/domain.conf> and the configuration file (if any) specified
+C</usr/local/etc/domain.conf>, C</etc/domain.conf> and the configuration file (if any) specified
 with the B<--config> command-line option.
 
 The whole configuration is read from the file (even if the option spec doesn't
@@ -171,8 +171,8 @@ it out.
 =back
 
 =head3 Class Methods
-
-=over 4
+=
+over 4
 
 =item __init__(domain, options)
 
@@ -355,9 +355,10 @@ class optconfig:
 				cmdline_parsed[optname] = True
 
 		# First, load global file, then load $HOME file	
-		cfgfilepath = [ '/opt/pptools/etc/' + domain + '.conf' ]
+		cfgfilepath = [ '/usr/local/etc' + domain + '.conf',
+                        '/etc' + domain + '.conf' ]
 		if "HOME" in os.environ:
-			cfgfilepath.append(os.environ['HOME'] + '/.' + domain)
+			cfgfilepath.insert(0, os.environ['HOME'] + '/.' + domain)
 
 		self['config'] = False
 		gotconfig = False;
@@ -466,17 +467,9 @@ class optconfig:
 		return json.dumps(obj)
 
 	################################################################################	
-	# TODO - not sure what this is for/where it is used/why it's here.
-	#def hash(self):
-	#
-	#		newhash = { }
-	#
-	#		for my $key (keys %$self) {
-	#   			$hash->{$key} = $self->{$key} unless $key =~ /^_/;
-	#		}
-	#
-	#		return $hash;
-	#
+	def dict(self):
+		return dict((k, v) for k, v in self._stuff.items() if not k.startswith('_'))
+	
 	################################################################################	
 	def vrb(self, level, msg):
 		if level <= int(self['verbose']):

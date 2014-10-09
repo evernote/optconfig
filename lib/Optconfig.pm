@@ -52,7 +52,7 @@ Optconfig - Configure and parse command-line options
 
 The Optconfig module looks in various places for its configuration. It will
 read configuration from I<one> of C<$HOME/.domain>,
-C</usr/local/etc/domain.conf> and the configuration file (if any) specified
+C</usr/local/etc/domain.conf>, C</etc/domain.conf> and the configuration file (if any) specified
 with the B<--config> command-line option.
 
 The whole configuration is read from the file (even if the option spec doesn't
@@ -279,8 +279,8 @@ sub new {
    GetOptions($cmdlineopt,
               @optspecs);
 
-   my $cfgfilepath = [ $ENV{'HOME'} . '/.' . $domain,
-                       '/usr/local/etc/' . $domain . '.conf' ];
+   my $cfgfilepath = [ '/usr/local/etc/' . $domain . '.conf',
+                       '/etc/' . $domain . '.conf' ];
    unshift(@$cfgfilepath, $ENV{'HOME'} . '/.' . $domain)
        if defined($ENV{'HOME'});
    $self->{'_config'} = undef;
