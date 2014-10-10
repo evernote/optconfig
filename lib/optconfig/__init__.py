@@ -242,10 +242,10 @@ import types
 import re
 import getopt
 
-################################################################################	
-class optconfig:
+from .version import __version__
 
-	VERSION = 1.0
+################################################################################	
+class Optconfig:
 
 	standard_opts = {
 		'config=s': False,
@@ -290,9 +290,12 @@ class optconfig:
 		return False
 
 	################################################################################	
-	def __init__(self, domain, submitted_optspec):
+	def __init__(self, domain, submitted_optspec, version=None):
 		self['_domain'] = domain
 		self['_optspec'] = self._add_standard_opts(submitted_optspec)
+                # Python just doesn't have a reasonably accessible concept of a
+                # top-level, global variable.
+                self['_version'] = version or 'Unknown version'
 		cmdlineopt = {}
 		defval = {}
 		optspecs = []
@@ -381,11 +384,18 @@ class optconfig:
 		#self.ocdbg(self['optconfig']));
 
 		if self['version']:
-			print self.VERSION
+                        print self['_version']
 			sys.exit(0)
 
 		if self['help']:
-			print myhelp
+                        binfile = os.path.abspath(sys.argv[0])
+                        help_pattern = re.compile('(?:^=head1 +SYNOPSIS)(.*?)(?:^=head1 +)', re.MULTILINE | re.DOTALL)
+                        with open(binfile, 'r') as f:
+                                match = help_pattern.search(f.read())
+                        if match is None:
+                                print "No help"
+                        else:
+                                print match.group(1).strip()
 			sys.exit(0)
 
 	################################################################################	
@@ -491,3 +501,6 @@ class optconfig:
 
 	################################################################################	
 	# end Optconfig class
+
+class optconfig(Optconfig):
+	pass

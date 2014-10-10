@@ -75,6 +75,12 @@
 # Avoid the "other languages"
 \bbashon.rb$
 \blongopt.rb$
-\boptconfig.py$
+\boptconfig.pyc{0:1}$
 \boptconfig.rb$
+\boptconfig.sh$
 \btest.sh$
+\bbash-showconfig$
+\bruby-showconfig$
+\bpython-showconfig$
+\bsetup.py$
+

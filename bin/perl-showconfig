@@ -16,6 +16,9 @@
 
 use Optconfig;
 use JSON;
+use vars qw($VERSION);
+
+$VERSION = $Optconfig::VERSION;
 
 print "Using ", $INC{'Optconfig.pm'}, "\n";
 

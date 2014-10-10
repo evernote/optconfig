@@ -1,10 +1,10 @@
-bin/showconfig
+bin/perl-showconfig
 Build.PL
 lib/Optconfig.pm
-lib/optconfig.sh
+lib/OptconfigVersion.pm
 LICENSE
 MANIFEST			This list of files
 optconfig.pod
-reference.rst
+README.rst
 META.yml
 META.json

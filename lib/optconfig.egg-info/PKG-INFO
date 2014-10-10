@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: optconfig
+Version: 1.1
+Summary: Parse command-line arguments and configuration files consistently
+Home-page: http://github.com/evernote/optconfig
+Author: Eric Robbins
+Author-email: erobbins@evernote.com
+License: Apache-2
+Description: UNKNOWN
+Platform: UNKNOWN

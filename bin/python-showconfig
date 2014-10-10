@@ -3,6 +3,9 @@
 import sys
 import json
 import optconfig
+from optconfig import Optconfig
+
+VERSION = optconfig.version.__version__
 
 print "Using {}".format(optconfig.__file__)
 
@@ -15,6 +18,31 @@ sys.argv.reverse()                  # Ugh.
 
 optspec = json.loads(optspectext)
 
-opt = optconfig.optconfig(domain, optspec)
+opt = Optconfig(domain, optspec, VERSION)
 
 print json.dumps(opt.dict())
+
+help = '''
+=head1 NAME
+
+showconfig - Display the standard configuration resulting from given options
+
+=head1 SYNOPSIS
+
+   perl-showconfig domain optspec [options]
+
+=head1 DESCRIPTION
+
+The standard Optconfig system provides a way to configure program execution
+in the context specified by domain.
+
+The optspec is a JSON-serialized option specifier (see L<Optconfig>). Other
+arguments are passed to the optconfig module (perl or ruby) to determine the
+final configuration.
+
+=head1 AUTHOR
+
+Jeremy Brinkley, E<lt>jbrinkley@evernote.comE<gt>
+
+=cut
+'''

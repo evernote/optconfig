@@ -224,6 +224,7 @@ Jeremy Brinkley, E<lt>jbrinkley@evernote.comE<gt>
 package Optconfig;
 
 use strict;
+use OptconfigVersion;
 use Getopt::Long;
 use JSON;
 use Data::Dumper;
@@ -234,7 +235,7 @@ use FindBin;
 use vars qw($VERSION $standard_opts);
 
 # It's okay that this is distinct from the other libraries. Mostly -jdb/20141008
-$VERSION = '1.1';
+$VERSION = $Optconfig::Version::VERSION;
 
 BEGIN {
    $standard_opts = {
@@ -259,11 +260,12 @@ sub _add_standard_opts {
 }
 
 sub new {
-   my ($class, $domain, $submitted_optspec) = @_;
+   my ($class, $domain, $submitted_optspec, $version) = @_;
 
    my $self = bless({ }, $class);
    $self->{'_domain'} = $domain;
    $self->{'_optspec'} = _add_standard_opts($submitted_optspec);
+   $self->{'_version'} = $version || $main::VERSION || 'Unknown version';
 
    my $cmdlineopt = { };
    my $defval = { };
@@ -318,36 +320,26 @@ sub new {
    $self->ocdbg(Data::Dumper->Dump([$self], ['optconfig']));
 
    if ($self->{'version'}) {
-      if (defined($main::VERSION)) {
-         print $main::VERSION, "\n";
-      } else {
-         print "Unknown version\n";
-      }
+       print $self->{'_version'}, "\n";
       exit(0);
    }
 
    if ($self->{'help'}) {
-      # Find ourselves
-      if (open(my $fh, '<', File::Spec->catfile($FindBin::RealBin, $FindBin::RealScript))) {
-         my $in_usage = 0;
-         my $had_usage = 0;
-         while (defined(my $line = <$fh>)) {
-            if ($in_usage) {
-               $had_usage = 1;
-               last if $line =~ /^=/;
-               print $line;
-            }
-            $in_usage = 1 if $line =~ /^=head1 +SYNOPSIS/;
-         }
-         close($fh);
-         if (! $had_usage) {
-            print "No help\n";
-         }
-      } else {
-         print STDERR "Can't find executable location\n";
-         exit(10);
-      }
-      exit(0);
+       my $text;
+       {
+           local $/;
+           if (open(my $fh, '<', File::Spec->catfile($FindBin::RealBin, $FindBin::RealScript))) {
+               $text = <$fh>;
+               close($fh);
+           }
+       }
+       my ($help_text) = $text =~ /(?:^=head1 +SYNOPSIS)(.*?)(?:^=head1)/msg;
+       if ($help_text) {
+           $help_text =~ s/^[\w\n]*//ms;
+           $help_text =~ s/[\w\n]*$//ms;
+           print $help_text, "\n";
+       }
+       exit(0);
    }
 
    return $self;
