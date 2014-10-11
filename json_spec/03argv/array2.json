@@ -1,0 +1,5 @@
+[
+    ["--test", "value1", "--test=value2"],
+    { "test=s@": [] },
+    { "test": ["value2", "value1"] }
+]

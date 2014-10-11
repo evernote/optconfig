@@ -1,0 +1,6 @@
+[
+    ["--test=success=excellent", "--test", "failure=bad"],
+    { "test=s%": { } },
+    { "test": { "success": "excellent",
+                "failure": "bad" } }
+]
