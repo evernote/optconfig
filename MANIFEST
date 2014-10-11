@@ -1,5 +1,5 @@
-bin/perl-showconfig
 Build.PL
+bin/perl-showconfig
 lib/Optconfig.pm
 lib/OptconfigVersion.pm
 LICENSE

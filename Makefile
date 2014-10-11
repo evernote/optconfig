@@ -9,4 +9,5 @@ python-dist:
 	python
 
 clean:
-	rm -rf *.tar.gz META.* MANIFEST.SKIP.bak optconfig.egg-info dist build
+	find . -name \*.pyc -exec rm {} \;
+	rm -rf *.tar.gz META.* MANIFEST.SKIP.bak optconfig.egg-info dist build pkg

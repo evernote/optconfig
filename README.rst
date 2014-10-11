@@ -19,7 +19,7 @@ Invoking an optconfig program
       --version        Print program version number
       --help           Print usage message
       --debug          Produce debugging output
-      Some programs will have options specific to them
+      Programs will also have options specific to them
 
 Description
 -----------
@@ -128,6 +128,55 @@ opt=x%           hash          The option argument(s) are interpreted as hash
                                multiple times)
 ================ ============= ===================================================
 
+Using Optconfig
+---------------
+
+Optconfig libraries are provided for Ruby, Perl and Python. In each language, an
+Optconfig class is provided that will parse command-line options and interpret
+configuration files in the same way.
+
+Class Methods
+~~~~~~~~~~~~~
+
+The object constructor accepts two or three arguments (only the three-argument
+form is meaningful for Python). The first argument names the configuration
+"domain", the second is a mapping that defines the option specifiers and their
+default values, and optional third argument explicitly provides the version
+that Optconfig should print when the ``--version`` option is passed.
+
+Perl::
+
+  use Optconfig;
+
+  my $opt = Optconfig->new($domain, $optspec);
+  my $opt = Optconfig->new($domain, $optspec, $VERSION);
+
+Python::
+
+  from optconfig import Optconfig
+
+  opt = Optconfig(domain, optspec, VERSION)
+
+Ruby::
+
+  require 'optconfig'
+
+  opt = Optconfig.new(domain, optspec)
+  opt = Optconfig.new(domain, optspec, $VERSION)
+
+If the user passes the ``--version`` or ``--help`` options, Optconfig
+satisfies these (by printing the *program* version or help) and exits.
+
+Object Methods
+~~~~~~~~~~~~~~
+
+The Optconfig object can be accessed by string as the native mapping type
+(e.g. Hash or Dict). In addition, it provides the following methods:
+
+* vrb() - accepts two arguments, level and message
+* dbg() - accepts two arguments, level and message
+
+
 Roadmap/Problems
 ----------------
 
@@ -152,4 +201,18 @@ file) whereas it should honor only the optspec.
 
 The next version of Optconfig will provide a new option specifier, ``%%``,
 meaning a potentially deep hash. Deep hash keys will be specified on the command
-line using JSON path (e.g. ``logging.value=DEBUG``).
+line using JSON path (e.g. ``logging.value=DEBUG``); or specified wholesale
+using inline JSON.
+
+All implementations of Optconfig will drop their "native" option-parsing libraries
+and use consistent logic, so that option syntax failures (for example) will be
+handled the same way.
+
+Feature flags will be provided so the user can control the behavior of Optconfig;
+namely:
+
+* Whether to stop option processing with ``--``
+* Whether to stop option processing with the first non-option argument
+* Whether to fail (or warn, or ignore) when encountering an unknown option
+* How to fail when the configuration file doesn't match the option spec
+* Whether to parse JSON arguments to array and hash options

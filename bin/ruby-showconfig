@@ -16,6 +16,8 @@
 
 require 'optconfig'
 
+$VERSION = Optconfig::VERSION
+
 lib_location = $LOADED_FEATURES.find { |f| f =~ /optconfig.rb$/ }
 
 puts "Using #{lib_location}"
@@ -25,27 +27,24 @@ optspec = JSON.load(ARGV.shift)
 opt = Optconfig.new(domain, optspec)
 puts opt.to_json
 
-$manpage = <<EOF
-=head1 NAME
-
-showconfig - Display the standard configuration resulting from given options
-
-=head1 SYNOPSIS
-
-   ruby-showconfig domain optspec [options]
-
-=head1 DESCRIPTION
-
-The standard Optconfig system provides a way to configure program execution
-in the context specified by domain.
-
-The optspec is a JSON-serialized option specifier (see L<Optconfig>). Other
-arguments are passed to the optconfig module (perl or ruby) to determine the
-final configuration.
-
-=head1 AUTHOR
-
-Jeremy Brinkley, E<lt>jbrinkley@evernote.comE<gt>
-
-=cut
-EOF
+# = NAME
+#
+# showconfig - Display the standard configuration resulting from given options
+#
+# = SYNOPSIS
+#
+#   ruby-showconfig domain optspec [options]
+#
+# = DESCRIPTION
+#
+# The standard Optconfig system provides a way to configure program execution
+# in the context specified by domain.
+#
+# The optspec is a JSON-serialized option specifier (see Optconfig). Other
+# arguments are passed to the optconfig module to determine the
+# final configuration.
+#
+# = AUTHOR
+#
+# Jeremy Brinkley, <jbrinkley@evernote.com>
+#

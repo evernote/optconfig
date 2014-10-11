@@ -15,11 +15,25 @@
 # limitations under the License.
 # */
 
+# = NAME
+#
+# Optconfig - Parse options and config files
+#
+# = DESCRIPTION
+#
+# This module implements the Optconfig standardized approach to
+# command-line option parsing and JSON-based configuration file
+# interpretation. See the reference documentation in the
+# Optconfig master distribution for details.
+#
+
 require 'longopt'
 require 'rubygems'
 require 'json'
 
 class Optconfig < Hash
+
+    require 'optconfig/version'
 
    attr_accessor :domain, :optspec, :config, :default
 
@@ -40,13 +54,16 @@ class Optconfig < Hash
       optspec
    end
 
-   def initialize(domain, submitted_optspec, cmdline=true)
+   def initialize(domain, submitted_optspec, version=nil)
       @domain = domain
       @optspec = add_standard_opts(submitted_optspec)
+       @caller_version = version || $VERSION || 'Unknown version'
+
       submitted_optspec.each_pair do |optspec, val|
          opt, dummy = optspec.split(/[\=\+\!]/, 2)
          self[opt] = val
       end
+
        cfgfilepath = [ '/usr/local/etc/' + domain + '.conf',
            '/etc/' + domain + '.conf' ]
 
@@ -54,11 +71,9 @@ class Optconfig < Hash
          cfgfilepath.unshift(ENV['HOME'] + '/.' + domain)
       end
       @config = nil
-      if cmdline
-         cmdlineopt = Longopt.new(optspec.keys)
-      else
-         cmdlineopt = {}
-      end
+
+       cmdlineopt = Longopt.new(optspec.keys)
+
       if cmdlineopt.has_key? 'config'
          @config = cmdlineopt['config']
          raise "File not found: #{cmdlineopt['config']}" unless
@@ -79,35 +94,25 @@ class Optconfig < Hash
       end
 
       if self.has_key? 'version' and self['version']
-         if ! $VERSION.nil?
-            puts $VERSION
-         else
-            puts "Unknown version"
-         end
-         Process.exit(0)
+          puts @caller_version
+          Process.exit(0)
       end
 
-      if self.has_key? 'help' and self['help']
-         myscript = File.expand_path($0)
-         had_usage = false
-         begin
-            in_usage = false
-            File.open(myscript, 'r') do |fh|
-               fh.each do |line|
-                  if in_usage
-                     had_usage = true
-                     break if line.match(/^=/)
-                     puts line
-                  end
-                  in_usage = true if line.match(/^=head1 +SYNOPSIS/)
-               end
-            end
-         rescue Errno::ENOENT
-         end
-         unless had_usage
-            puts "No help"
-         end
-         Process.exit(0)
+       if self.has_key? 'help' and self['help']
+          help_pattern = /(?:^=head1 +SYNOPSIS|^# *=+ *SYNOPSIS)(.*?)(?:^=head1|^# *=+)/m
+          myscript = File.expand_path($0)
+          begin
+              script_text = File.open(myscript, 'r') { |fh| fh.read }
+              m = help_pattern.match(script_text)
+              if m
+                  puts m[1].gsub(/^# ?/m, '').strip
+              else
+                  puts 'No help'
+              end
+          rescue Errno::ENOENT
+              puts "No help (could not search #{myscript})"
+          end
+          Process.exit(0)
       end
    end
 
@@ -152,32 +157,5 @@ class Optconfig < Hash
          puts "DBG(#{@domain}): " + msg.join("DBG(#{@domain}):    ")
       end
    end
-
-   @@manpage = <<'EOF'
-=head1 NAME
-
-Optconfig - Parse options and config files
-
-=head1 SYNOPSIS
-
-   opt = Optconfig.new(domain, { 'file=s' => '/var/log/file',
-                                 'force!' => false,
-                                 'define=s%' => { } })
-
-   File.open(opt['file'], 'w') { |fh| fh.puts "Log entry" }
-
-=head1 DESCRIPTION
-
-This module implements a common config file and command-line option parsing
-interface, including Optconfig standard options, that is shared with the
-Optconfig Perl module. See that module for details.
-
-=head1 AUTHOR
-
-Jeremy Brinkley, E<lt>jbrinkley@evernote.comE<gt>
-
-=cut
-
-EOF
 
 end
