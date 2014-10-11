@@ -4,7 +4,6 @@ lib/Optconfig.pm
 lib/OptconfigVersion.pm
 LICENSE
 MANIFEST			This list of files
-optconfig.pod
 README.rst
 META.yml
 META.json

@@ -6,3 +6,4 @@ MANIFEST.SKIP.bak
 META.*
 MYMETA.*
 *.pyc
+**optconfig.egg-info/
