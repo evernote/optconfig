@@ -20,8 +20,14 @@ my $build = Module::Build->new
          'lib/OptconfigVersion.pm'  => 'lib/OptconfigVersion.pm'
      },
      requires => {
-         'perl'          => '5.6.1'
+         'perl'          => '5.6.1',
+         'JSON'          => 0
      },
+     build_requires => {
+         'Test::Spec'    => 0,
+         'JSON'          => '>= 2.0',
+         'Class::Accessor' => 0
+     }
     );
 
 $build->create_build_script;

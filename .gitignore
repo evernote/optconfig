@@ -1,4 +1,6 @@
 _build/
+build/
+blib/
 Build
 *.tar.gz
 *.gem
