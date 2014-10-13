@@ -13,4 +13,4 @@ ruby-dist:
 
 clean:
 	find . -name \*.pyc -exec rm {} \;
-	rm -rf *.tar.gz META.* MANIFEST.SKIP.bak optconfig.egg-info dist build blib _build pkg doc lib/optconfig.egg-info
+	rm -rf *.tar.gz MYMETA.* META.* MANIFEST.SKIP.bak optconfig.egg-info dist build blib _build pkg doc lib/optconfig.egg-info *.gem
