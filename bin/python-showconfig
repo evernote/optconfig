@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+import sys
+import json
+import optconfig
+from optconfig import Optconfig
+
+VERSION = optconfig.version.__version__
+
+print "Using {}".format(optconfig.__file__)
+
+sys.argv.reverse()                  # Ugh. Ugh.
+script = sys.argv.pop()
+domain = sys.argv.pop()
+optspectext = sys.argv.pop()
+sys.argv.append(script)             # Ugh.
+sys.argv.reverse()                  # Ugh.
+
+optspec = json.loads(optspectext)
+
+opt = Optconfig(domain, optspec, VERSION)
+
+print json.dumps(opt.dict())
+
+"""
+NAME
+====
+
+showconfig - Display the standard configuration resulting from given options
+
+SYNOPSIS
+========
+
+.. ::
+
+   perl-showconfig domain optspec [options]
+
+DESCRIPTION
+===========
+
+The standard Optconfig system provides a way to configure program execution
+in the context specified by domain.
+
+The optspec is a JSON-serialized option specifier (see Optconfig_). Other
+arguments are passed to the optconfig module to determine the
+final configuration.
+
+AUTHOR
+======
+
+Jeremy Brinkley, <jbrinkley@evernote.com>
+"""

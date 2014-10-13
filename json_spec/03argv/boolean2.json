@@ -1,0 +1,5 @@
+[
+    ["--notest"],
+    { "test!": true },
+    { "test": false }
+]

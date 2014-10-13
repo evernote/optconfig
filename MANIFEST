@@ -1,0 +1,9 @@
+Build.PL
+bin/perl-showconfig
+lib/Optconfig.pm
+lib/OptconfigVersion.pm
+LICENSE
+MANIFEST			This list of files
+README.rst
+META.yml
+META.json

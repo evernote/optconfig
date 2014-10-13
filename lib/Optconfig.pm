@@ -1,228 +1,38 @@
 #!perl
-# /* Copyright 2013 Proofpoint, Inc. All rights reserved.
-# 
+
+#
+# Copyright 2013 Proofpoint, Inc. All rights reserved.
+# Copyright 2014 Evernote Corp. All rights reserved.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# */
+#
 
 =head1 NAME
 
-Optconfig - Configure and parse command-line options
-
-=head1 SYNOPSIS
-
-   # Invoking an optconfig program
-
-   program [options] arguments...
-      --config=file    Use file for configuration
-      --verbose        Produce verbose output
-      --dry-run        Do a dry run (don't change things)
-      --version        Print program version number
-      --help           Print usage message
-      --debug          Produce debugging output
-      Some programs will have options specific to them
-
-   # In optconfig program
-   use Optconfig;
-
-   # Configuration is read from
-   my $opt = Optconfig->new('domain', { 'force!' => 0,
-                                        'logfile=s' => '/var/log/foo',
-                                        'define=s%' });
-
-   unlink($filefoo) if $opt->{'force'};
-
-   open(my $fh, '>', $opt->{'logfile'}) and print $fh, "Message\n";
-
-   for my $key (keys %{$opt->{'define'}}) {
-      print "$key = $opt->{'define'}->{$key}\n";
-   }
+Optconfig - Parse command-line options and configuration files
 
 =head1 DESCRIPTION
 
-The Optconfig module looks in various places for its configuration. It will
-read configuration from I<one> of C<$HOME/.domain>,
-C</usr/local/etc/domain.conf> and the configuration file (if any) specified
-with the B<--config> command-line option.
-
-The whole configuration is read from the file (even if the option spec doesn't
-contain those configuration items), and values can be overridden by
-command-line options specified in the option spec.
-
-There is a standard set of options you can pass (or configure in a config
-file) to Optconfig programs.
-
-=head2 Standard Options
-
-=over
-
-=item --config=file
-
-Optconfig reads the configuration in the named file. The configuration file
-format is JSON.  If it can't read this file, it complains. If no --config
-option is specified, it will search for a configuration file in the standard
-locations as listed above. If it finds a file, it reads it and sets config
-values accordingly, then overrides or merges these values with the ones on
-the command line.
-
-Some options can be specified multiple times. For example, a --define option
-might allow you to define more than one key; or a --host option might allow
-you to define more than one host. If these options appear in the configuration
-file and the command line, their values are added to by the command line value
-For example, if you have a configuration file with the following contents:
-
-   { "define": { "name": "bob", "home": "/home/bob" }
-     "host": [ "wiki.ppops.net", "tickets.ppops.net" ] }
-
-And you pass C<--define mail=bob@proofpoint.com> C<--host=mail.ppops.net> into
-the command, the resulting configuration will be:
-
-   { "define": { "mail": "bob@proofpoint.com", "name": "bob",
-                 "home": "/home/bob" },
-     "host": [ "mail.ppops.net", "wiki.ppops.net", "tickets.ppops.net" ] }
-
-Note how the command-line value for C<--host> is prepended to the list.
-
-=item --verbose
-
-Produce verbose output. You can specify this a number of times indicating
-increased verbosity.
-
-=item --dry-run
-
-The command will print what it would have done, but won't change anything in
-databases or on disk.
-
-=item --version
-
-Print the program version.
-
-=item --help
-
-Print a help message.
-
-=item --debug
-
-Producing debugging output. You can specify this a number of times indicating
-increased debugging output volume.
-
-=back
-
-=head2 Using the Optconfig Module
-
-=head3 Option Signatures
-
-=over 4
-
-=item config=s
-
-The config file is a string. You don't have to do anything with it.
-
-=item verbose+
-
-The 'verbose' option value is a number indicating the verbosity level. You can
-test this and/or use the L<vrb()> method.
-
-=item debug+
-
-The 'debug' option value is a number indicating the level. You can test this
-and/or use the L<vrb()> method.
-
-=item dry-run!
-
-This is a boolean indicating whether a dry run is happening. You need to test
-this when performing operations that would change persistent data. For example:
-
-   my $sth = $dbh->prepare("DROP TABLE $tab");
-   $opt->vrb(1, "Dropping table users");
-   $sth->execute() unless $opt->{'dry-run'};
-   $sth->finish();
-
-=item version
-
-Define a global variable $VERSION and Optconfig will print it out.
-
-=item help
-
-If your program has a pod page with a SYNOPSIS section, Optconfig will print
-it out.
-
-=back
-
-=head3 Class Methods
-
-=over 4
-
-=item new($domain, \%options)
-
-Parse command-line options and configuration files using $domain.
-
-Each pair in the option hash is composed of an option specifer and a default
-value. The option specifier is exactly that given in the L<Getopt::Long>
-module.
-
-=back
-
-=head3 Object Methods
-
-=over 4
-
-=item vrb($level, $msg, ...)
-
-Prints verbose output if the --verbose level is at or greater than the
-verbosity mentioned. Thus, if you specify a level of 1, the message will be
-printed if the user has specified C<--verbose>. If you specify a level of 3,
-the user will have to pass C<--verbose --verbose --verbose> to see it.
-
-=item dbg($level, $msg, ...)
-
-Similar to L<vrb()>, but uses the value of the C<--debug> option and prints
-a tag indicating the domain.
-
-=back
-
-=head1 BUGS
-
-When consulting a configuration file, Optconfig should check the options for
-adherence to the optspec, and it doesn't. This could result in unclear
-failures in the program where the wrong type is configured (for example,
-a scalar for a list).
-
-There's no easy way to "empty out" an already-configured list or map value
-from the configuration. In the example above, there's no combination of
-command-line options that would result in a one-element list for the 'host'
-option.
-
-When Optconfig is merging the command-line options into the configuration,
-it is affected by the type of the existing option value (from the configuration
-file) whereas it should honor only the optspec.
-
-=head1 AUTHOR
-
-Jeremy Brinkley, E<lt>jbrinkley@proofpoint.comE<gt>
-
-=head1 SEE ALSO
-
-=over 4
-
-=item showconfig
-
-=back
+This Perl module implements the Optconfig standard for command-line
+option parsing merged with JSON-based configuration file interpretation.
+See the reference documentation in the Optconfig master distribution.
 
 =cut
 
 package Optconfig;
 
 use strict;
+use OptconfigVersion;
 use Getopt::Long;
 use JSON;
 use Data::Dumper;
@@ -230,7 +40,10 @@ use Carp;
 use File::Spec;
 use FindBin;
 
-use vars qw($standard_opts);
+use vars qw($VERSION $standard_opts);
+
+# It's okay that this is distinct from the other libraries. Mostly -jdb/20141008
+$VERSION = $Optconfig::Version::VERSION;
 
 BEGIN {
    $standard_opts = {
@@ -255,11 +68,12 @@ sub _add_standard_opts {
 }
 
 sub new {
-   my ($class, $domain, $submitted_optspec) = @_;
+   my ($class, $domain, $submitted_optspec, $version) = @_;
 
    my $self = bless({ }, $class);
    $self->{'_domain'} = $domain;
    $self->{'_optspec'} = _add_standard_opts($submitted_optspec);
+   $self->{'_version'} = $version || $main::VERSION || 'Unknown version';
 
    my $cmdlineopt = { };
    my $defval = { };
@@ -275,8 +89,8 @@ sub new {
    GetOptions($cmdlineopt,
               @optspecs);
 
-   my $cfgfilepath = [ $ENV{'HOME'} . '/.' . $domain,
-                       '/usr/local/etc/' . $domain . '.conf' ];
+   my $cfgfilepath = [ '/usr/local/etc/' . $domain . '.conf',
+                       '/etc/' . $domain . '.conf' ];
    unshift(@$cfgfilepath, $ENV{'HOME'} . '/.' . $domain)
        if defined($ENV{'HOME'});
    $self->{'_config'} = undef;
@@ -304,7 +118,7 @@ sub new {
          if ($@) {
             carp "Error reading config file $file: $@";
          }
-      }      
+      }
    }
 
    for my $opt (keys %$cmdlineopt) {
@@ -314,36 +128,33 @@ sub new {
    $self->ocdbg(Data::Dumper->Dump([$self], ['optconfig']));
 
    if ($self->{'version'}) {
-      if (defined($main::VERSION)) {
-         print $main::VERSION, "\n";
-      } else {
-         print "Unknown version\n";
-      }
+       print $self->{'_version'}, "\n";
       exit(0);
    }
 
    if ($self->{'help'}) {
-      # Find ourselves
-      if (open(my $fh, '<', File::Spec->catfile($FindBin::RealBin, $FindBin::RealScript))) {
-         my $in_usage = 0;
-         my $had_usage = 0;
-         while (defined(my $line = <$fh>)) {
-            if ($in_usage) {
-               $had_usage = 1;
-               last if $line =~ /^=/;
-               print $line;
-            }
-            $in_usage = 1 if $line =~ /^=head1 +SYNOPSIS/;
-         }
-         close($fh);
-         if (! $had_usage) {
-            print "No help\n";
-         }
-      } else {
-         print STDERR "Can't find executable location\n";
-         exit(10);
-      }
-      exit(0);
+       my $text;
+       my $error_text;
+       my $myscript = File::Spec->catfile($FindBin::RealBin, $FindBin::RealScript);
+
+       {
+           local $/;
+           if (open(my $fh, '<', $myscript)) {
+               $text = <$fh>;
+               close($fh);
+           } else {
+               $error_text = "No help (could not search $myscript)";
+           }
+       }
+       my ($help_text) = $text =~ /(?:^=head1 +SYNOPSIS)(.*?)(?:^=head1)/msg;
+       if ($help_text) {
+           $help_text =~ s/^[\w\n]*//ms;
+           $help_text =~ s/[\w\n]*$//ms;
+           print $help_text, "\n";
+       } else {
+           print(($error_text || 'No help'), "\n");
+       }
+       exit(0);
    }
 
    return $self;

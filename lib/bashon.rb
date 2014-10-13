@@ -1,12 +1,13 @@
 #!ruby
 # /* Copyright 2013 Proofpoint, Inc. All rights reserved.
-# 
+#    Copyright 2014 Evernote Corp. All rights reserved.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -78,7 +79,7 @@ function is invoked, it will yield the value of that element.
 head4 Hashes
 
 A function is created with the specified name that outputs a space-separated
-list of has keys. When the same function is invoked with a hash key as an
+list of hash keys. When the same function is invoked with a hash key as an
 argument, it outputs the name of a function. That function, when invoked,
 will yield the value of that element.
 
@@ -100,7 +101,7 @@ This shows how a boolean value is serialized:
 This shows how a nil value is serialized:
 
    puts nil.to_bashon('var')
-   
+
    unset var
 
    $ if [ -z "$(var)" ]; then echo No var; fi
@@ -111,7 +112,7 @@ This shows how a string is serialized and used:
    puts "catalog data".to_bashon('var')
 
    function var { echo catalog data; }
-   
+
    $ string=$(var)
    $ echo $string
    catalago data
@@ -254,7 +255,7 @@ This is viable but I think it's less convenient to use from bash.
 
 =head1 AUTHOR
 
-Jeremy Brinkley, E<lt>jbrinkley@proofpoint.comE<gt>
+Jeremy Brinkley, E<lt>jbrinkley@evernote.comE<gt>
 
 =cut
 EOF

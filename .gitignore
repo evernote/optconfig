@@ -1,0 +1,11 @@
+_build/
+build/
+blib/
+Build
+*.tar.gz
+*.gem
+MANIFEST.SKIP.bak
+META.*
+MYMETA.*
+*.pyc
+**optconfig.egg-info/
