@@ -54,7 +54,7 @@ class JSONTestCase(unittest.TestCase):
 
     def runTest(self):
         global domain, version
-        sys.argv = list(self.json_spec.argv)
+        sys.argv = list(sys.argv[0:1]) + list(self.json_spec.argv)
         self.json_spec.fix(domain)
         opt = Optconfig(domain,
                             self.json_spec.optspec,

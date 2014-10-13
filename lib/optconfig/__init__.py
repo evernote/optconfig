@@ -136,7 +136,10 @@ class Optconfig:
 
         cmdline_parsed = {}
 
+        self.ocdbg('='.join(["sys.argv", repr(sys.argv)]))
         cmdlineopt, args = getopt.getopt(sys.argv[1:], "", getopt_arg)
+        self.ocdbg('cmdlineopt=' + repr(cmdlineopt),
+                   'args=' + repr(args))
         for i in range(0, len(cmdlineopt)):
             optname = cmdlineopt[i][0][2:]
             if optname in stringopts:
@@ -152,16 +155,16 @@ class Optconfig:
                 cmdline_parsed[optname] = True
 
         # First, load global file, then load $HOME file
-        cfgfilepath = [ '/usr/local/etc' + domain + '.conf',
-                        '/etc' + domain + '.conf' ]
+        cfgfilepath = [ os.path.join('/usr/local/etc', domain + '.conf'),
+                        os.path.join('/etc', domain + '.conf') ]
         if "HOME" in os.environ:
-            cfgfilepath.insert(0, os.environ['HOME'] + '/.' + domain)
+            cfgfilepath.insert(0, os.path.join(os.environ['HOME'], '.' + domain))
 
         self['config'] = False
         gotconfig = False;
 
         for file in cfgfilepath:
-            self['config'] = file
+            # self['config'] = file -- ?
             rval = self._read_config(file, False)
             if gotconfig == False:
                 gotconfig = rval
@@ -288,12 +291,12 @@ class Optconfig:
             print "%s: %s" % (dbgstr, dbgstr.join(msg))
 
     ################################################################################
-    def ocdbg(self, arg):
+    def ocdbg(self, *arg):
     # This debugging is controlled by an environment variable, because
     # it's really orthogonal to the use of a 'debug' option in the constructor
     # or something like that. -jdb/20100812
         if "OPTCONFIG_DEBUG" in os.environ:
-            print "\nDBG(Optconfig)".join(arg)
+            print "\nDBG(Optconfig): ".join(arg)
 
     ################################################################################
     # end Optconfig class
