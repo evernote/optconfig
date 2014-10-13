@@ -40,7 +40,7 @@ import getopt
 from .version import __version__
 
 ################################################################################
-class Optconfig:
+class Optconfig(dict):
 
     standard_opts = {
         'config=s': None,
@@ -50,7 +50,6 @@ class Optconfig:
         'help':    False,
         'dry-run!': False
     }
-    _stuff = {}
 
     ################################################################################
     def croak(self, msg, err = ""):
@@ -66,23 +65,6 @@ class Optconfig:
             if i not in optspec:
                 optspec[i] = self.standard_opts[i]
         return optspec
-
-    ################################################################################
-    def __setitem__(self, key, val):
-        #print "setting %s to %s" % (key, val)
-        self._stuff[key] = val
-
-    ################################################################################
-    def __getitem__(self, key):
-        if key in self._stuff:
-            return self._stuff[key]
-        return False
-
-    ################################################################################
-    def __contains__(self, key):
-        if key in self._stuff:
-            return True
-        return False
 
     ################################################################################
     def __init__(self, domain, submitted_optspec, version=None):
@@ -295,7 +277,7 @@ class Optconfig:
 
     ################################################################################
     def dict(self):
-        return dict((k, v) for k, v in self._stuff.items() if not k.startswith('_'))
+        return dict((k, v) for k, v in self.items() if not k.startswith('_'))
 
     ################################################################################
     def vrb(self, level, msg):
