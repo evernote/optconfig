@@ -43,12 +43,12 @@ from .version import __version__
 class Optconfig:
 
     standard_opts = {
-        'config=s': False,
+        'config=s': None,
         'debug+':   0,
         'verbose+': 0,
-        'version':  0,
-        'help':    0,
-        'dry-run!': 0
+        'version':  False,
+        'help':    False,
+        'dry-run!': False
     }
     _stuff = {}
 
@@ -92,42 +92,53 @@ class Optconfig:
 
         cmdlineopt = {}
         defval = {}
+        proto = { }
         optspecs = []
-        stringopts = []
-        boolopts = []
-        intopts = []
-        listopts = []
-        dictopts = []
         getopt_arg = []
 
         for optspec in submitted_optspec:
             val = submitted_optspec[optspec]
             optspecs.append(optspec)
-            opt = re.split("[=\!\+]", optspec, 1);
-            if "=s%" in optspec:
-                dictopts.append(opt[0])
-                getopt_arg.append(opt[0] + "=")
-            elif "=s@" in optspec:
-                listopts.append(opt[0])
-                getopt_arg.append(opt[0] + "=")
-            elif "=" in optspec:
-                stringopts.append(opt[0])
-                getopt_arg.append(opt[0] + "=")
-            elif "+" in optspec:
-                intopts.append(opt[0])
-                getopt_arg.append(opt[0] + "=")
+            opt, optproto = re.match('^([a-z0-9][^=+\!]*)([=+\!].*|)', optspec).groups()
+            self[opt] = val
+            proto[opt] = {
+                'proto': optproto
+            }
+            if optproto.startswith('='):
+                getopt_arg.append(opt + '=')
+                proto[opt]['arg'] = True
+            elif optproto == '!':
+                getopt_arg.append(opt)
+                getopt_arg.append('no' + opt)
+                proto['no' + opt] = {
+                    'collect': 'set',
+                    'type': lambda s: None,
+                    'value':   (opt, False)
+                }
             else:
-                boolopts.append(opt[0])
-                getopt_arg.append(opt[0])
-            self[opt[0]] = val
+                getopt_arg.append(opt)
 
-        #print "dictopts %s" % (dictopts)
-        #print "listopts %s" % (listopts)
-        #print "stringopts %s" % (stringopts)
-        #print "intopts %s" % (intopts)
-        #print "boolopts %s" % (boolopts)
+            if optproto.endswith('@'):
+                proto[opt]['collect'] = 'array'
+            elif optproto.endswith('%'):
+                proto[opt]['collect'] = 'object'
+            elif optproto.startswith('+'):
+                proto[opt]['collect'] = 'count'
+            else:
+                proto[opt]['collect'] = False
 
+            if 'i' in optproto:
+                proto[opt]['type'] = lambda s: int(s)
+            elif 'f' in optproto:
+                proto[opt]['type'] = lambda s: float(s)
+            elif '%' in optproto:
+                proto[opt]['type'] = lambda s: s.split('=', 1)
+            elif 's' in optproto:
+                proto[opt]['type'] = lambda s: s
+            else:
+                proto[opt]['type'] = lambda s: True
 
+            
         # So.. we need to read files first, then override from cmdline
         # TODO
         #GetOptions($cmdlineopt, @optspecs);
@@ -136,23 +147,30 @@ class Optconfig:
 
         cmdline_parsed = {}
 
-        self.ocdbg('='.join(["sys.argv", repr(sys.argv)]))
         cmdlineopt, args = getopt.getopt(sys.argv[1:], "", getopt_arg)
-        self.ocdbg('cmdlineopt=' + repr(cmdlineopt),
-                   'args=' + repr(args))
-        for i in range(0, len(cmdlineopt)):
-            optname = cmdlineopt[i][0][2:]
-            if optname in stringopts:
-                cmdline_parsed[optname] = cmdlineopt[i][1]
-            elif optname in dictopts:
-                cmdline_parsed[optname] = json.loads(cmdlineopt[i][1])
-                #print "loaded dict from %s" % (cmdlineopt[i][1])
-            elif optname in listopts:
-                cmdline_parsed[optname] = re.split("[, ]", cmdlineopt[i][1])
-            elif optname in intopts:
-                cmdline_parsed[optname] = int(cmdlineopt[i][1])
+
+        for (givenopt, optarg) in cmdlineopt:
+            opt = givenopt[2:]
+            collect = proto[opt]['collect']
+            value = proto[opt]['type'](optarg)
+            self.ocdbg("encountered opt '%s'/%s with value: %s" % (opt, collect, repr(value)))
+            if collect == 'count':
+                if opt not in cmdline_parsed or not cmdline_parsed[opt]:
+                    cmdline_parsed[opt] = 0
+                cmdline_parsed[opt] += 1
+            elif collect == 'array':
+                if opt not in cmdline_parsed or not cmdline_parsed[opt]:
+                    cmdline_parsed[opt] = [ ]
+                cmdline_parsed[opt].append(value)
+            elif collect == 'object':
+                if opt not in cmdline_parsed or not cmdline_parsed[opt]:
+                    cmdline_parsed[opt] = { }
+                cmdline_parsed[opt][value[0]] = value[1]
+            elif collect == 'set':
+                (newopt, newoptarg) = proto[opt]['value']
+                cmdline_parsed[newopt] = newoptarg
             else:
-                cmdline_parsed[optname] = True
+                cmdline_parsed[opt] = value
 
         # First, load global file, then load $HOME file
         cfgfilepath = [ os.path.join('/usr/local/etc', domain + '.conf'),
