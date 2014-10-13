@@ -18,4 +18,7 @@ setup(name          = 'optconfig',
       packages      = ['optconfig'],
       scripts       = ['bin/python-showconfig'],
 
+      # tests_require = ['mamba', 'expects'],
+      # test_loader   = 'mamba:Loader',
+
       zip_safe      = False)
