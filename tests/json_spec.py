@@ -38,12 +38,14 @@ class JSONSpec:
         self.fixture     = data[3] if len(data) > 3 else None
 
     def fix(self, domain):
+        filename = domain if '/' in domain else os.path.join(os.environ['HOME'], '.' + domain)
         if self.fixture:
-            filename = domain if '/' in domain else os.path.join(os.environ['HOME'], '.' + domain)
-            with open(filename, 'r') as fh:
+            with open(filename, 'w') as fh:
                 json.dump(self.fixture, fh,
                           indent = 4,
                           separators = (',', ': '))
+        elif os.path.isfile(filename):
+            os.remove(filename)
 
 class JSONTestCase(unittest.TestCase):
     def __init__(self, json_spec):

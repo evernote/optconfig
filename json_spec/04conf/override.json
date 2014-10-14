@@ -1,0 +1,6 @@
+[
+    ["--test=value2"],
+    { "test=s": null },
+    { "test": "value2" },
+    { "test": "value1" }
+]

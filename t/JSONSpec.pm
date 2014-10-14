@@ -42,11 +42,12 @@ sub fix {
     my $filename = ($domain =~ m{/} ? $domain : File::Spec->join($ENV{'HOME'}, '.' . $domain));
 
     if ($self->fixture) {
-        if (open(my $fh, '<', $filename)) {
+        if (open(my $fh, '>', $filename)) {
             $fh->print(encode_json($self->fixture));
             close($fh);
         }
-
+    } elsif (-f $filename) {
+        unlink $filename;
     }
 }
 

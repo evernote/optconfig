@@ -9,10 +9,9 @@ use Carp;
 use lib File::Basename::dirname(__FILE__);
 use JSONSpec;
 
+use Optconfig;
 
-BEGIN {
-    use_ok('Optconfig');
-}
+plan tests => (scalar(JSONSpec->find_specs()));
 
 sub strip_json_bs {
     my ($v) = @_;
@@ -47,6 +46,7 @@ sub strip_json_bs {
 our $json_dir = File::Spec->join(File::Basename::dirname(__FILE__), '..', 'json_specs');
 our @saved_argv = (@ARGV);
 
+
 for my $json_spec (JSONSpec->get_specs()) {
     
     my $context = ($json_spec->context || 'general');
@@ -61,4 +61,3 @@ for my $json_spec (JSONSpec->get_specs()) {
                $json_spec->context . ' ' . $json_spec->name);
 }
 
-plan tests => (scalar(JSONSpec->find_specs()) + 1);

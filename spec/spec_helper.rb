@@ -21,6 +21,8 @@ class JSONSpec
             File.open(filename, 'w') do |fh|
                 fh.puts JSON.pretty_generate(@fixture)
             end
+        else
+            File.unlink(filename) if File.exist? filename
         end
     end
 
