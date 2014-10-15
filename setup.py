@@ -18,7 +18,7 @@ setup(name          = 'optconfig',
       packages      = ['optconfig'],
       scripts       = ['bin/python-showconfig'],
 
-      test_suite    = 'tests',
+      test_suite    = 'tests.load_tests',
       test_loader   = 'unittest:TestLoader',
 
       zip_safe      = False)

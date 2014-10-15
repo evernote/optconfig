@@ -5,6 +5,7 @@ package JSONSpec;
 use warnings;
 use strict;
 
+use IO::Handle;
 use Class::Accessor;
 use File::Find;
 use File::Spec;
