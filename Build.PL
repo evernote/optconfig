@@ -23,7 +23,7 @@ my $build = Module::Build->new
          'perl'          => '5.6.1',
          'JSON'          => 0
      },
-     build_requires => {
+     test_requires => {
          'Test::Spec'    => 0,
          'JSON'          => '>= 2.0',
          'Class::Accessor' => 0
