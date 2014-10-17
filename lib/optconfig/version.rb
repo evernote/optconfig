@@ -1,5 +1,5 @@
 class Optconfig
 
-    VERSION = '1.1'
+    VERSION = '1.5'
 
 end
