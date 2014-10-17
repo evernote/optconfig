@@ -111,6 +111,8 @@ command-line parsers like Perl's Getopt::Long.
 Option Specifier Type of Value Description
 ================ ============= ===================================================
 opt              boolean
+opt!             boolean       Can also be specified as ``--noopt``, which sets
+                               option value false
 opt+             integer       The number of times the option is specified in
                                command-line arguments (can be passed multiple
                                times)
@@ -166,6 +168,12 @@ Ruby::
 
 If the user passes the ``--version`` or ``--help`` options, Optconfig
 satisfies these (by printing the *program* version or help) and exits.
+
+The program help is found by looking at the source file for the command
+being invoked (the Ruby version understands gem wrappers for this),
+and scans that file for a **SYNOPSIS** section. This section can be
+included as POD (in every language) or in that language's native
+inline documentation format (rdoc or rST for Ruby and Python, respectively).
 
 Object Methods
 ~~~~~~~~~~~~~~
