@@ -115,10 +115,14 @@ class Optconfig < Hash
                   # already been called with that version will help
                   # the following work correctly. Because there's no
                   # real other alternative.
+                  #
+                  # This 'parsing' is really a load of crap. Sure hope
+                  # Rubygems never changes anything.
                   # -jdb/20141010
-                  script_text = File.open(Gem.bin_path('optconfig',
-                                                       File.basename($0)),
-                                          'r') { |fh| fh.read }
+                  if m = /^\s*load +(.*)$/.match(script_text)
+                      script_file = eval("version = nil\n" + m[1])
+                      script_text = File.open(script_file, 'r') { |fh| fh.read }
+                  end
               end
               m = help_pattern.match(script_text)
               if m
