@@ -117,7 +117,7 @@ class Optconfig < Hash
                   # real other alternative.
                   # -jdb/20141010
                   script_text = File.open(Gem.bin_path('optconfig',
-                                                       'ruby-showconfig'),
+                                                       File.basename($0)),
                                           'r') { |fh| fh.read }
               end
               m = help_pattern.match(script_text)
