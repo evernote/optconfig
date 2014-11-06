@@ -14,7 +14,8 @@ Gem::Specification.new do |spec|
     spec.license       = "Apache-2"
 
     spec.files         = ['lib/optconfig.rb', 'lib/optconfig/version.rb',
-        'lib/longopt.rb', 'lib/bashon.rb', 'bin/ruby-showconfig']
+        'lib/longopt.rb', 'lib/bashon.rb', 'bin/ruby-showconfig',
+        'lib/optconfig.sh']
 
     spec.executables   = ['ruby-showconfig']
     spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
