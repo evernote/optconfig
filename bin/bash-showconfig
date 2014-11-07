@@ -20,6 +20,8 @@
 domain="$1"
 shift 1
 
+SCRIPT_VERSION=$(ruby -rubygems -e 'require "optconfig/version"; puts Optconfig::VERSION')
+
 echo -n "Using "; which optconfig.sh
 . optconfig.sh
 opt_new_gen $domain "$@"

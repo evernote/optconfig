@@ -27,8 +27,8 @@
 # Optconfig master distribution for details.
 #
 
-require 'longopt'
 require 'rubygems'
+require 'longopt'
 require 'json'
 
 class Optconfig < Hash

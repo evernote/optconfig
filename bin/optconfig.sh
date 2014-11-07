@@ -32,7 +32,7 @@ opt_new_gen()
    shift 1
    optspec="$1"
    shift 1
-   ruby \
+   ruby -rubygems \
       -e 'require "optconfig"' \
       -e 'require "json"' \
       -e 'require "bashon"' \
@@ -53,7 +53,7 @@ opt_new_gen()
 
 json2bashon_gen()
 {
-   ruby \
+   ruby -rubygems \
       -e 'require "bashon"' \
       -e 'require "json"' \
       -e 'name = ARGV.shift' \
