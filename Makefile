@@ -9,7 +9,7 @@ python-dist:
 	python setup.py sdist && cp dist/$(NAME)-$(shell python -c 'exec(open("lib/optconfig/version.py").read()); print __version__').tar.gz .
 
 ruby-dist:
-	rake build && cp pkg/optconfig-$(shell ruby -Ilib -roptconfig/version -e 'puts Optconfig::VERSION').gem .
+	rake build && cp pkg/noms-optconfig-$(shell ruby -Ilib -roptconfig/version -e 'puts Optconfig::VERSION').gem .
 
 clean:
 	find . -name \*.pyc -exec rm {} \;

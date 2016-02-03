@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'optconfig/version'
 
 Gem::Specification.new do |spec|
-    spec.name          = "optconfig"
+    spec.name          = "noms-optconfig"
     spec.version       = Optconfig::VERSION
     spec.authors       = ["Jeremy Brinkley"]
     spec.email         = ["jbrinkley@evernote.com"]
